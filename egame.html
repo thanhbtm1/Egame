@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Career Path Quiz Game</title>
-  <script src="/_sdk/element_sdk.js"></script>
   <style>
     body {
       box-sizing: border-box;
@@ -12,33 +11,26 @@
       padding: 0;
       font-family: 'Nunito', 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100%;
+      min-height: 100vh;
       width: 100%;
       overflow-x: hidden;
     }
     
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     .background-pattern {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       background-image: 
         radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
     }
     
     .game-container {
       position: relative;
       width: 100%;
-      min-height: 100%;
+      min-height: 100vh;
       padding: 30px 20px;
       display: flex;
       flex-direction: column;
@@ -55,29 +47,53 @@
       box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
       position: relative;
       overflow: hidden;
+      transition: transform 0.1s; /* Cho hiệu ứng rung */
     }
 
-    .game-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 6px;
-      background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe, #667eea);
-      background-size: 200% 100%;
-      animation: gradientShift 3s linear infinite;
+    /* Hiệu ứng rung khi sai */
+    .shake-effect {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
     }
 
-    @keyframes gradientShift {
-      0% { background-position: 0% 0%; }
-      100% { background-position: 200% 0%; }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
     }
-    
-    .game-header {
-      text-align: center;
-      margin-bottom: 35px;
+
+    /* Popup thông báo kết quả */
+    .feedback-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px 40px;
+      border-radius: 16px;
+      font-size: 32px;
+      font-weight: 900;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      z-index: 9999;
+      pointer-events: none;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+
+    .feedback-popup.correct {
+      color: #48bb78;
+      border: 4px solid #48bb78;
+    }
+
+    .feedback-popup.wrong {
+      color: #f56565;
+      border: 4px solid #f56565;
+    }
+
+    .feedback-popup.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .game-header { text-align: center; margin-bottom: 35px; }
     
     .game-title {
       font-size: 42px;
@@ -85,35 +101,15 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
       margin: 0 0 12px 0;
-      text-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
     
-    .game-subtitle {
-      font-size: 18px;
-      color: #718096;
-      margin: 0;
-      font-weight: 500;
-    }
+    .game-subtitle { font-size: 18px; color: #718096; margin: 0; font-weight: 500; }
 
-    /* Team Selection Screen */
-    .team-selection {
-      display: block;
-    }
-
-    .team-selection.hidden {
-      display: none;
-    }
-
-    .selection-instruction {
-      text-align: center;
-      font-size: 20px;
-      color: #2d3748;
-      margin-bottom: 30px;
-      font-weight: 600;
-    }
-
+    /* Team Selection */
+    .team-selection { display: block; }
+    .team-selection.hidden { display: none; }
+    
     .careers-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -129,1030 +125,315 @@
       text-align: center;
       cursor: pointer;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
     }
 
-    .career-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .career-card:hover::before {
-      left: 100%;
-    }
-
-    .career-card:hover {
-      transform: translateY(-8px);
-      border-color: #667eea;
-      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
-    }
-
+    .career-card:hover { transform: translateY(-8px); border-color: #667eea; }
     .career-card.selected {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-color: #667eea;
       transform: scale(1.05);
-      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
     }
+    .career-card.selected .career-name, .career-card.selected .career-desc { color: white; }
+    .career-card.taken { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-    .career-card.taken {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
+    .career-icon { font-size: 56px; display: block; margin-bottom: 15px; }
+    .career-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #2d3748; }
+    .career-desc { font-size: 14px; color: #718096; }
 
-    .career-icon {
-      font-size: 56px;
-      margin-bottom: 15px;
-      display: block;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .career-name {
-      font-size: 22px;
-      font-weight: 700;
-      color: #2d3748;
-      margin-bottom: 8px;
-    }
-
-    .career-card.selected .career-name {
-      color: #ffffff;
-    }
-
-    .career-desc {
-      font-size: 14px;
-      color: #718096;
-      font-weight: 500;
-    }
-
-    .career-card.selected .career-desc {
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .team-info {
-      background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
-      text-align: center;
-    }
-
-    .team-label {
-      font-size: 16px;
-      color: #718096;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .team-name-display {
-      font-size: 28px;
-      font-weight: 800;
-      color: #667eea;
-      margin-bottom: 5px;
-    }
-
-    .confirm-button {
+    .confirm-button, .submit-answer-button, .restart-button {
       width: 100%;
       padding: 18px;
-      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
       border: none;
       border-radius: 12px;
       font-size: 20px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      margin-top: 20px;
     }
-
-    .confirm-button:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(72, 187, 120, 0.4);
-    }
-
-    .confirm-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .confirm-button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    .confirm-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* Quiz Screen */
-    .quiz-screen {
-      display: none;
-    }
-
-    .quiz-screen.active {
-      display: block;
-    }
+    .quiz-screen { display: none; }
+    .quiz-screen.active { display: block; }
 
     .current-team-banner {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #ffffff;
+      color: white;
       padding: 20px;
       border-radius: 16px;
       text-align: center;
       margin-bottom: 25px;
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    }
-
-    .current-team-banner h2 {
-      margin: 0 0 8px 0;
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    .current-team-banner p {
-      margin: 0;
-      font-size: 18px;
-      opacity: 0.95;
-    }
-
-    .question-counter {
-      text-align: center;
-      font-size: 18px;
-      color: #718096;
-      margin-bottom: 20px;
-      font-weight: 600;
     }
 
     .question-box {
-      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      background: #f7fafc;
       border-radius: 16px;
       padding: 30px;
       margin-bottom: 25px;
       border: 2px solid #e2e8f0;
     }
+    .question-text { font-size: 24px; font-weight: 700; color: #2d3748; }
 
-    .question-text {
-      font-size: 24px;
-      font-weight: 700;
-      color: #2d3748;
-      margin: 0;
-      line-height: 1.5;
-    }
-
-    .answers-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
+    .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    
     .answer-button {
-      background: #ffffff;
+      background: white;
       border: 3px solid #e2e8f0;
       border-radius: 12px;
       padding: 20px;
       font-size: 17px;
       font-weight: 600;
-      color: #2d3748;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s;
       text-align: left;
-      position: relative;
-      overflow: hidden;
     }
 
-    .answer-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .answer-button:hover::before {
-      opacity: 1;
-    }
-
-    .answer-button:hover {
-      border-color: #667eea;
-      transform: translateX(5px);
-    }
-
-    .answer-button.selected {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-color: #667eea;
-      color: #ffffff;
-      transform: scale(1.02);
-    }
-
-    .answer-button.correct {
-      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-      border-color: #48bb78;
-      color: #ffffff;
-      animation: correctPulse 0.6s ease;
-    }
-
-    .answer-button.wrong {
-      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-      border-color: #f56565;
-      color: #ffffff;
-      animation: wrongShake 0.5s ease;
-    }
-
-    @keyframes correctPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    @keyframes wrongShake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    .submit-answer-button {
-      width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #ffffff;
-      border: none;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .submit-answer-button:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-    }
-
-    .submit-answer-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .answer-button:hover { border-color: #667eea; }
+    .answer-button.selected { background: #667eea; color: white; border-color: #667eea; }
+    .answer-button.correct { background: #48bb78; color: white; border-color: #48bb78; }
+    .answer-button.wrong { background: #f56565; color: white; border-color: #f56565; }
 
     /* Scoreboard */
-    .scoreboard-screen {
-      display: none;
-    }
-
-    .scoreboard-screen.active {
-      display: block;
-    }
-
-    .scoreboard-title {
-      text-align: center;
-      font-size: 38px;
-      font-weight: 900;
-      color: #2d3748;
-      margin-bottom: 35px;
-    }
-
-    .scores-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 30px;
-    }
+    .scoreboard-screen { display: none; }
+    .scoreboard-screen.active { display: block; }
 
     .score-item {
-      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-      border: 3px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 20px 25px;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.3s ease;
     }
+    .score-item.rank-1 { background: #fffbe6; border-color: #ffd700; transform: scale(1.02); }
 
-    .score-item.rank-1 {
-      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-      border-color: #ffd700;
-      transform: scale(1.05);
-      box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
-      animation: winnerGlow 2s ease-in-out infinite;
+    /* Fireworks */
+    .fireworks-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999;
     }
-
-    @keyframes winnerGlow {
-      0%, 100% { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4); }
-      50% { box-shadow: 0 20px 50px rgba(255, 215, 0, 0.6); }
-    }
-
-    .score-item.rank-2 {
-      background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
-      border-color: #c0c0c0;
-      transform: scale(1.02);
-    }
-
-    .score-item.rank-3 {
-      background: linear-gradient(135deg, #cd7f32 0%, #e8a87c 100%);
-      border-color: #cd7f32;
-    }
-
-    .score-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .rank-badge {
-      font-size: 28px;
-      font-weight: 900;
-      width: 50px;
-      height: 50px;
-      background: #667eea;
-      color: #ffffff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-
-    .score-item.rank-1 .rank-badge {
-      background: #2d3748;
-      font-size: 32px;
-    }
-
-    .score-item.rank-2 .rank-badge {
-      background: #4a5568;
-    }
-
-    .score-item.rank-3 .rank-badge {
-      background: #744210;
-    }
-
-    .team-details {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .team-name-score {
-      font-size: 22px;
-      font-weight: 700;
-      color: #2d3748;
-    }
-
-    .career-name-score {
-      font-size: 15px;
-      color: #718096;
-      font-weight: 600;
-    }
-
-    .score-points {
-      font-size: 32px;
-      font-weight: 900;
-      color: #667eea;
-    }
-
-    .score-item.rank-1 .score-points {
-      color: #2d3748;
-      font-size: 38px;
-    }
-
-    .winner-message {
-      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-      color: #ffffff;
-      padding: 25px;
-      border-radius: 16px;
-      text-align: center;
-      margin-bottom: 25px;
-      font-size: 24px;
-      font-weight: 700;
-      box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
-      animation: winnerPulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes winnerPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-    }
-
-    .fireworks {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    .firework {
+    .particle {
       position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      animation: explode 1.5s ease-out forwards;
+      width: 8px; height: 8px; border-radius: 50%;
+      animation: pop 1s ease-out forwards;
     }
-
-    @keyframes explode {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--tx), var(--ty)) scale(0);
-        opacity: 0;
-      }
-    }
-
-    .restart-game-button {
-      width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #ffffff;
-      border: none;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .restart-game-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    @keyframes pop {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
     }
 
     @media (max-width: 768px) {
-      .game-card {
-        padding: 25px;
-      }
-
-      .game-title {
-        font-size: 32px;
-      }
-
-      .careers-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .answers-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .question-text {
-        font-size: 20px;
-      }
+      .game-card { padding: 20px; }
+      .answers-grid { grid-template-columns: 1fr; }
     }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
  </head>
  <body>
   <div class="background-pattern"></div>
-  <main class="game-container">
-   <div class="game-card">
+  
+  <div class="game-container">
+   <div class="game-card" id="mainCard">
     <div class="game-header">
-     <h1 class="game-title" id="gameTitle">🎮 Career Path Quiz Game</h1>
-     <p class="game-subtitle" id="instructionText">7 Teams • 7 Careers • 10 Questions Each</p>
-    </div><!-- Team Selection Screen -->
+     <h1 class="game-title">🎮 Career Quiz Game</h1>
+     <p class="game-subtitle">7 Teams • 7 Careers • 10 Questions Each</p>
+    </div>
+
     <div class="team-selection" id="teamSelection">
-     <div class="team-info">
-      <div class="team-label">
-       Currently Selecting:
-      </div>
-      <div class="team-name-display" id="currentTeamName">
-       Team 1
-      </div>
-     </div>
-     <p class="selection-instruction">Choose your career path:</p>
-     <div class="careers-grid" id="careersGrid"></div><button class="confirm-button" id="confirmButton" disabled onclick="confirmSelection()"> Start Quiz → </button>
-    </div><!-- Quiz Screen -->
+     <h3 style="text-align: center; color: #4a5568;">Choosing: <span id="currentTeamName" style="color: #667eea; font-weight: 800; font-size: 24px;">Team 1</span></h3>
+     <div class="careers-grid" id="careersGrid"></div>
+     <button class="confirm-button" id="confirmButton" disabled onclick="confirmSelection()">START QUIZ →</button>
+    </div>
+
     <div class="quiz-screen" id="quizScreen">
      <div class="current-team-banner">
-      <h2 id="quizTeamName">Team 1</h2>
-      <p id="quizCareerName">Doctor</p>
+      <h2 id="quizTeamName" style="margin:0">Team 1</h2>
+      <p id="quizCareerName" style="margin:5px 0 0 0">Doctor</p>
      </div>
-     <div class="question-counter" id="questionCounter">
-      Question 1 of 5
-     </div>
+     <p style="text-align: center; color: #718096; font-weight: bold;" id="questionCounter">Question 1/10</p>
+     
      <div class="question-box">
       <p class="question-text" id="questionText"></p>
      </div>
-     <div class="answers-grid" id="answersGrid"></div><button class="submit-answer-button" id="submitButton" disabled onclick="submitAnswer()"> Submit Answer </button>
-    </div><!-- Scoreboard Screen -->
+     
+     <div class="answers-grid" id="answersGrid"></div>
+     <button class="submit-answer-button" id="submitButton" disabled onclick="submitAnswer()">SUBMIT ANSWER</button>
+    </div>
+
     <div class="scoreboard-screen" id="scoreboardScreen">
-     <h2 class="scoreboard-title">🏆 Final Results</h2>
-     <div class="winner-message" id="winnerMessage"></div>
-     <div class="scores-list" id="scoresList"></div><button class="restart-game-button" onclick="restartGame()"> 🔄 Play Again </button>
+     <h2 style="text-align: center; font-size: 32px;">🏆 Final Results</h2>
+     <div id="winnerMessage" style="text-align: center; padding: 20px; background: #48bb78; color: white; border-radius: 12px; margin-bottom: 20px; font-weight: bold;"></div>
+     <div id="scoresList"></div>
+     <button class="restart-button" onclick="location.reload()">🔄 Play Again</button>
     </div>
    </div>
-  </main>
-  <div class="fireworks" id="fireworks"></div>
+  </div>
+
+  <div id="feedbackPopup" class="feedback-popup">Correct! +15</div>
+  <div class="fireworks-container" id="fireworks"></div>
+
   <script>
-    const defaultConfig = {
-      game_title: "🎮 Career Path Quiz Game",
-      instruction_text: "7 Teams • 7 Careers • 5 Questions Each",
-      winner_message: "🎉 Congratulations! You are the Winner! 🎉",
-      background_color: "#667eea",
-      surface_color: "#ffffff",
-      text_color: "#2d3748",
-      primary_action_color: "#667eea",
-      secondary_action_color: "#48bb78",
-      font_family: "Nunito",
-      font_size: 16
-    };
-
+    // === DATA SOURCE ===
+    // Paste mảng careers của bạn vào đây (tôi giữ nguyên cấu trúc cũ)
     const careers = [
-  {
-    id: 1,
-    name: "Doctor",
-    icon: "👨‍⚕️",
-    description: "Healthcare Hero",
-    questions: [
       {
-        question: "If a patient has a deep cut that is bleeding a lot, they might need...",
-        answers: ["A simple bandage", "Stitches", "Some ice cream", "A warm bath"],
-        correct: 1
+        id: 1, name: "Doctor", icon: "👨‍⚕️", description: "Healthcare Hero",
+        questions: [
+          { question: "If a patient has a deep cut that is bleeding a lot, they might need...", answers: ["A simple bandage", "Stitches", "Some ice cream", "A warm bath"], correct: 1 },
+          { question: "A doctor writes a note for the pharmacist. This note is called a...", answers: ["Recipe", "Prescription", "Menu", "Receipt"], correct: 1 },
+          { question: "Which doctor specializes in fixing teeth?", answers: ["Dentist", "Surgeon", "Nurse", "Vet"], correct: 0 },
+          { question: "If you eat something bad and your stomach hurts, you have...", answers: ["A headache", "Food poisoning", "A broken leg", "A sunburn"], correct: 1 },
+          { question: "What is the 'emergency room' used for?", answers: ["Buying food", "Sleeping at night", "Treating urgent and serious health problems", "Parking cars"], correct: 2 },
+          { question: "To check if a bone is broken, a doctor will take an...", answers: ["X-ray", "Email", "Interview", "Exam"], correct: 0 },
+          { question: "A 'surgeon' is a doctor who...", answers: ["Only gives advice", "Performs operations", "Drives the ambulance", "Sells medicine"], correct: 1 },
+          { question: "Recovery means...", answers: ["Getting worse", "Getting better after being sick", "Going on holiday", "Eating dinner"], correct: 1 },
+          { question: "If a disease is 'contagious', it means...", answers: ["It is very rare", "It cannot be cured", "It can spread from person to person", "It is genetic"], correct: 2 },
+          { question: "Before surgery, the patient usually signs a...", answers: ["Consent form", "Birthday card", "Check", "Newspaper"], correct: 0 }
+        ]
       },
       {
-        question: "A doctor writes a note for the pharmacist to give you medicine. This note is called a...",
-        answers: ["Recipe", "Prescription", "Menu", "Receipt"],
-        correct: 1
+        id: 2, name: "Teacher", icon: "👩‍🏫", description: "Knowledge Sharer",
+        questions: [
+          { question: "What does a teacher use to mark a student's attendance?", answers: ["A register", "A dictionary", "A storybook", "A map"], correct: 0 },
+          { question: "If a student behaves badly, the teacher might give them...", answers: ["A reward", "Detention", "A high grade", "A candy"], correct: 1 },
+          { question: "The head of a school is usually called the...", answers: ["Manager", "Principal", "Captain", "Boss"], correct: 1 },
+          { question: "A 'deadline' for an assignment is...", answers: ["Start day", "Last day to submit", "Easiest part", "Subject name"], correct: 1 },
+          { question: "When students work together, it is called...", answers: ["Group work", "Silent reading", "Exam time", "Solo project"], correct: 0 },
+          { question: "To 'revise' for an exam means to...", answers: ["Forget everything", "Study again", "Write a book", "Sleep"], correct: 1 },
+          { question: "A university degree is a type of...", answers: ["Qualification", "Machine", "Sport", "Food"], correct: 0 },
+          { question: "Usually, a school year is divided into...", answers: ["Weeks", "Terms/Semesters", "Hours", "Centuries"], correct: 1 },
+          { question: "If a student 'cheats', they...", answers: ["Study hard", "Break rules", "Ask for help", "Leave early"], correct: 1 },
+          { question: "A library is where students can...", answers: ["Play football", "Borrow books", "Eat lunch", "Buy clothes"], correct: 1 }
+        ]
       },
       {
-        question: "Which doctor specializes in fixing teeth?",
-        answers: ["Dentist", "Surgeon", "Nurse", "Vet"],
-        correct: 0
+        id: 3, name: "Programmer", icon: "👨‍💻", description: "Code Creator",
+        questions: [
+           { question: "Instructions written by a programmer are called...", answers: ["Code", "Recipe", "Novel", "Lyrics"], correct: 0 },
+           { question: "If a program has a mistake, it is called a...", answers: ["Fly", "Bug", "Bee", "Worm"], correct: 1 },
+           { question: "Popular programming language?", answers: ["English", "Python", "Latin", "Spanish"], correct: 1 },
+           { question: "Programmers build...", answers: ["Houses", "Websites & Apps", "Cars", "Furniture"], correct: 1 },
+           { question: "To keep an account safe, you need a...", answers: ["Door", "Password", "Bag", "Ticket"], correct: 1 },
+           { question: "Attack by hackers is a...", answers: ["Security breach", "Party", "Meeting", "Holiday"], correct: 0 },
+           { question: "A 'database' is used to...", answers: ["Play games", "Store data", "Clean screen", "Print paper"], correct: 1 },
+           { question: "Open-source means...", answers: ["Expensive", "Code is public", "Closed", "No code"], correct: 1 },
+           { question: "Physical parts of a computer are...", answers: ["Software", "Hardware", "Underwear", "Tupperware"], correct: 1 },
+           { question: "Installing new version to fix problems is an...", answers: ["Update", "Upload", "Upside", "Upset"], correct: 0 }
+        ]
       },
       {
-        question: "If you eat something bad and your stomach hurts, you have...",
-        answers: ["A headache", "Food poisoning", "A broken leg", "A sunburn"],
-        correct: 1
+        id: 4, name: "Content Creator", icon: "📹", description: "Digital Storyteller",
+        questions: [
+            { question: "When a video becomes popular quickly...", answers: ["Viral", "Bad", "Slow", "Away"], correct: 0 },
+            { question: "People who follow a channel...", answers: ["Customers", "Subscribers", "Managers", "Employees"], correct: 1 },
+            { question: "Put video on internet...", answers: ["Download", "Upload", "Print", "Delete"], correct: 1 },
+            { question: "Editing means...", answers: ["Watching", "Improving video", "Selling", "Buying"], correct: 1 },
+            { question: "A 'thumbnail' is...", answers: ["Hand part", "Video cover image", "Title", "End screen"], correct: 1 },
+            { question: "Creators earn money via...", answers: ["Ads/Sponsors", "Paying viewers", "Stealing", "Sleeping"], correct: 0 },
+            { question: "Platform for short vertical videos?", answers: ["Netflix", "TikTok", "Excel", "Kindle"], correct: 1 },
+            { question: "Streaming means...", answers: ["Live broadcast", "Recording", "Writing", "Taking photo"], correct: 0 },
+            { question: "Viewers write opinions in...", answers: ["Video", "Comments", "Bed", "Bank"], correct: 1 },
+            { question: "Using music without permission causes...", answers: ["Copyright strike", "Happiness", "Friendship", "Bonus"], correct: 0 }
+        ]
       },
       {
-        question: "What is the 'emergency room' used for?",
-        answers: ["Buying food", "Sleeping at night", "Treating urgent and serious health problems", "Parking cars"],
-        correct: 2
+        id: 5, name: "Salesperson", icon: "🤝", description: "Sales Expert",
+        questions: [
+            { question: "Return product for money...", answers: ["Refund", "Receipt", "Recipe", "Reward"], correct: 0 },
+            { question: "Discount means price is...", answers: ["Higher", "Lower", "Free", "Taxed"], correct: 1 },
+            { question: "Guarantee/Warranty is...", answers: ["Promise to repair", "Credit card", "Bag", "Meeting"], correct: 0 },
+            { question: "Out of stock means...", answers: ["Full", "Sold out", "On sale", "Broken"], correct: 1 },
+            { question: "Try on clothes in...", answers: ["Waiting room", "Fitting room", "Living room", "Dining room"], correct: 1 },
+            { question: "Negotiate means...", answers: ["Pay full", "Discuss price", "Argue", "Leave"], correct: 1 },
+            { question: "Receipt proves...", answers: ["Theft", "Payment", "Desire", "Management"], correct: 1 },
+            { question: "Wholesale means...", answers: ["Single item", "Bulk/Large qty", "Expensive", "Online"], correct: 1 },
+            { question: "Good service builds...", answers: ["Loyalty", "Enemies", "Traffic", "Noise"], correct: 0 },
+            { question: "Commission is...", answers: ["Salary", "Extra earnings", "Penalty", "Tax"], correct: 1 }
+        ]
       },
       {
-        question: "To check if a bone is broken, a doctor will take an...",
-        answers: ["X-ray", "Email", "Interview", "Exam"],
-        correct: 0
+        id: 6, name: "Manager", icon: "👔", description: "Team Leader",
+        questions: [
+            { question: "CV helps manager decide...", answers: ["Party guest", "Who to interview", "Lunch", "Holiday"], correct: 1 },
+            { question: "Good job leads to...", answers: ["Firing", "Promotion", "Ignoring", "Punishment"], correct: 1 },
+            { question: "Salary is paid...", answers: ["Daily", "Monthly", "Yearly", "For lunch"], correct: 1 },
+            { question: "Team meeting involves...", answers: ["Staff meeting", "Dinner", "Concert", "Sleepover"], correct: 0 },
+            { question: "Quitting job requires...", answers: ["List", "Resignation letter", "Love letter", "Menu"], correct: 1 },
+            { question: "Training helps...", answers: ["Waste time", "Learn skills", "Cost nothing", "Tire people"], correct: 1 },
+            { question: "Manager is responsible for...", answers: ["Supervising", "Cleaning", "Repairing", "Driving"], correct: 0 },
+            { question: "Budget is plan for...", answers: ["Money", "Time", "Dress", "Food"], correct: 0 },
+            { question: "Stress management helps...", answers: ["Feel worse", "Work better", "Quit", "Fight"], correct: 1 },
+            { question: "To 'hire' means...", answers: ["Give job", "Send home", "Sell", "Ask"], correct: 0 }
+        ]
       },
       {
-        question: "A 'surgeon' is a doctor who...",
-        answers: ["Only gives advice", "Performs operations", "Drives the ambulance", "Sells medicine"],
-        correct: 1
-      },
-      {
-        question: "Recovery means...",
-        answers: ["Getting worse", "Getting better after being sick", "Going on holiday", "Eating dinner"],
-        correct: 1
-      },
-      {
-        question: "If a disease is 'contagious', it means...",
-        answers: ["It is very rare", "It cannot be cured", "It can spread from person to person", "It is genetic"],
-        correct: 2
-      },
-      {
-        question: "Before surgery, the patient usually signs a...",
-        answers: ["Consent form", "Birthday card", "Check", "Newspaper"],
-        correct: 0
+        id: 7, name: "Businessperson", icon: "💼", description: "Entrepreneur",
+        questions: [
+            { question: "Earnings after costs...", answers: ["Debt", "Profit", "Loss", "Tax"], correct: 1 },
+            { question: "New company is...", answers: ["Start-up", "Finish-line", "Old", "School"], correct: 0 },
+            { question: "Marketing is to...", answers: ["Hide", "Attract/Sell", "Scare", "Save"], correct: 1 },
+            { question: "Competitor is...", answers: ["Partner", "Rival business", "Customer", "Lawyer"], correct: 1 },
+            { question: "Money from bank to start...", answers: ["Gift", "Loan", "Fine", "Receipt"], correct: 1 },
+            { question: "Legal agreement...", answers: ["Contract", "Novel", "Ticket", "Diary"], correct: 0 },
+            { question: "Bankrupt means...", answers: ["Rich", "Lost all money", "Hiring", "New bank"], correct: 1 },
+            { question: "Investment is for...", answers: ["Lunch", "Future profit", "Fine", "Bet"], correct: 1 },
+            { question: "Taxes paid to...", answers: ["Government", "Customers", "Competitors", "Neighbors"], correct: 0 },
+            { question: "CEO is...", answers: ["Worker", "Highest manager", "Guard", "Cleaner"], correct: 1 }
+        ]
       }
-    ]
-  },
-  {
-    id: 2,
-    name: "Teacher",
-    icon: "👩‍🏫",
-    description: "Knowledge Sharer",
-    questions: [
-      {
-        question: "What does a teacher use to mark a student's attendance?",
-        answers: ["A register / Attendance list", "A dictionary", "A storybook", "A map"],
-        correct: 0
-      },
-      {
-        question: "If a student behaves badly, the teacher might give them...",
-        answers: ["A reward", "Detention or punishment", "A high grade", "A candy"],
-        correct: 1
-      },
-      {
-        question: "The head of a school is usually called the...",
-        answers: ["Manager", "Principal / Headmaster", "Captain", "Boss"],
-        correct: 1
-      },
-      {
-        question: "A 'deadline' for an assignment is...",
-        answers: ["The day the assignment starts", "The last day to submit the assignment", "The easiest part of the work", "The name of the subject"],
-        correct: 1
-      },
-      {
-        question: "When students work together in a small group, it is called...",
-        answers: ["Group work", "Silent reading", "Exam time", "Solo project"],
-        correct: 0
-      },
-      {
-        question: "To 'revise' for an exam means to...",
-        answers: ["Forget everything", "Study what you have learned again", "Write a new book", "Sleep in class"],
-        correct: 1
-      },
-      {
-        question: "A university degree is a type of...",
-        answers: ["Qualification", "Machine", "Sport", "Food"],
-        correct: 0
-      },
-      {
-        question: "Usually, a school year is divided into...",
-        answers: ["Weeks", "Terms or Semesters", "Hours", "Centuries"],
-        correct: 1
-      },
-      {
-        question: "If a student 'cheats' on a test, they...",
-        answers: ["Study very hard", "Break the rules to get a good mark", "Ask the teacher for help", "Leave the room early"],
-        correct: 1
-      },
-      {
-        question: "A library is a place in school where students can...",
-        answers: ["Play football", "Borrow books and study", "Eat lunch", "Buy clothes"],
-        correct: 1
-      }
-    ]
-  },
-  {
-    id: 3,
-    name: "Programmer",
-    icon: "👨‍💻",
-    description: "Code Creator",
-    questions: [
-      {
-        question: "The instructions written by a programmer are called...",
-        answers: ["Code", "Recipe", "Novel", "Lyrics"],
-        correct: 0
-      },
-      {
-        question: "If a program has a mistake, it is called a...",
-        answers: ["Fly", "Bug", "Bee", "Worm"],
-        correct: 1
-      },
-      {
-        question: "Which of these is a popular programming language?",
-        answers: ["English", "Python", "Latin", "Spanish"],
-        correct: 1
-      },
-      {
-        question: "Programmers often build...",
-        answers: ["Houses and bridges", "Websites and Apps", "Cars and trucks", "Furniture"],
-        correct: 1
-      },
-      {
-        question: "To keep an account safe, you need a strong...",
-        answers: ["Door", "Password", "Bag", "Ticket"],
-        correct: 1
-      },
-      {
-        question: "When a computer system is attacked by hackers, it is a...",
-        answers: ["Security breach", "Party", "Meeting", "Holiday"],
-        correct: 0
-      },
-      {
-        question: "A 'database' is used to...",
-        answers: ["Play games", "Store and organize data", "Clean the screen", "Print paper"],
-        correct: 1
-      },
-      {
-        question: "If software is 'open-source', it means...",
-        answers: ["It is very expensive", "Anyone can see and change the code", "It is closed", "It has no code"],
-        correct: 1
-      },
-      {
-        question: "The physical parts of a computer (like the screen and keyboard) are...",
-        answers: ["Software", "Hardware", "Underwear", "Tupperware"],
-        correct: 1
-      },
-      {
-        question: "When you install a new version of an app to fix problems, it is an...",
-        answers: ["Update", "Upload", "Upside", "Upset"],
-        correct: 0
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: "Content Creator",
-    icon: "📹",
-    description: "Digital Storyteller",
-    questions: [
-      {
-        question: "When a video becomes very popular quickly, it goes...",
-        answers: ["Viral", "Bad", "Slow", "Away"],
-        correct: 0
-      },
-      {
-        question: "People who follow a YouTube channel are called...",
-        answers: ["Customers", "Subscribers", "Managers", "Employees"],
-        correct: 1
-      },
-      {
-        question: "To put a video onto the internet, you must...",
-        answers: ["Download it", "Upload it", "Print it", "Delete it"],
-        correct: 1
-      },
-      {
-        question: "What is 'editing'?",
-        answers: ["Watching a movie", "Changing and improving the video/photo", "Selling a camera", "Buying a computer"],
-        correct: 1
-      },
-      {
-        question: "A 'thumbnail' is...",
-        answers: ["A part of your hand", "The small picture cover of a video", "The title of a video", "The end of a video"],
-        correct: 1
-      },
-      {
-        question: "Creators often earn money through...",
-        answers: ["Sponsorships and Ads", "Paying the viewers", "Stealing", "Sleeping"],
-        correct: 0
-      },
-      {
-        question: "Which platform is famous for short, vertical videos?",
-        answers: ["Netflix", "TikTok", "Excel", "Kindle"],
-        correct: 1
-      },
-      {
-        question: "If you 'stream' content, you are...",
-        answers: ["Broadcasting it live", "Recording it for later", "Writing a book", "taking a photo"],
-        correct: 0
-      },
-      {
-        question: "The 'comments section' is where...",
-        answers: ["The video plays", "Viewers write their opinions", "The creator sleeps", "You pay money"],
-        correct: 1
-      },
-      {
-        question: "Using someone else's music without permission can cause a...",
-        answers: ["Copyright strike", "Happy feeling", "New friend", "Bonus payment"],
-        correct: 0
-      }
-    ]
-  },
-  {
-    id: 5,
-    name: "Salesperson",
-    icon: "🤝",
-    description: "Sales Expert",
-    questions: [
-      {
-        question: "If a customer is not happy, they might ask for a...",
-        answers: ["Refund", "Receipt", "Recipe", "Reward"],
-        correct: 0
-      },
-      {
-        question: "A 'discount' means the price is...",
-        answers: ["Higher than usual", "Reduced / Lower", "Free", "Taxed"],
-        correct: 1
-      },
-      {
-        question: "What is a 'guarantee' or 'warranty'?",
-        answers: ["A promise to repair/replace a product", "A type of credit card", "A shopping bag", "A sales meeting"],
-        correct: 0
-      },
-      {
-        question: "If a product is 'out of stock', it means...",
-        answers: ["The shop has many", "It is sold out / none left", "It is on sale", "It is broken"],
-        correct: 1
-      },
-      {
-        question: "The place where you try on clothes is the...",
-        answers: ["Waiting room", "Fitting room", "Living room", "Dining room"],
-        correct: 1
-      },
-      {
-        question: "To 'negotiate' means to...",
-        answers: ["Pay full price", "Discuss to reach a better deal", "Argue angrily", "Leave the shop"],
-        correct: 1
-      },
-      {
-        question: "A 'receipt' proves that...",
-        answers: ["You have stolen the item", "You have paid for the item", "You want to buy the item", "You are the manager"],
-        correct: 1
-      },
-      {
-        question: "Buying in 'bulk' or 'wholesale' usually means...",
-        answers: ["Buying one item", "Buying large quantities for a lower price", "Buying expensive things", "Buying online"],
-        correct: 1
-      },
-      {
-        question: "Good customer service helps to build...",
-        answers: ["Loyalty", "Enemies", "Traffic", "Noise"],
-        correct: 0
-      },
-      {
-        question: "A 'commission' is...",
-        answers: ["A fixed salary", "Extra money earned for selling an item", "A penalty fee", "A type of tax"],
-        correct: 1
-      }
-    ]
-  },
-  {
-    id: 6,
-    name: "Manager",
-    icon: "👔",
-    description: "Team Leader",
-    questions: [
-      {
-        question: "A CV (Curriculum Vitae) or Resume helps a manager decide...",
-        answers: ["Who to invite to a party", "Who to interview for a job", "What to eat for lunch", "Where to go on holiday"],
-        correct: 1
-      },
-      {
-        question: "If an employee does a very good job, the manager might...",
-        answers: ["Fire them", "Promote them", "Ignore them", "Punish them"],
-        correct: 1
-      },
-      {
-        question: "The 'salary' is the money paid...",
-        answers: ["Every day", "Usually every month for work done", "Only once a year", "For lunch only"],
-        correct: 1
-      },
-      {
-        question: "When a team meets to discuss work, it is a...",
-        answers: ["Staff meeting", "Family dinner", "Music concert", "Sleepover"],
-        correct: 0
-      },
-      {
-        question: "If an employee quits their job, they usually write a...",
-        answers: ["Shopping list", "Resignation letter", "Love letter", "Menu"],
-        correct: 1
-      },
-      {
-        question: "Training is important because...",
-        answers: ["It wastes time", "It helps employees learn new skills", "It costs nothing", "It makes people tired"],
-        correct: 1
-      },
-      {
-        question: "A manager is responsible for...",
-        answers: ["Supervising the team", "Cleaning the floor", "Repairing the lights", "Driving the bus"],
-        correct: 0
-      },
-      {
-        question: "The 'budget' is the plan for...",
-        answers: ["How to spend money", "How to spend time", "How to dress", "How to eat"],
-        correct: 0
-      },
-      {
-        question: "Stress management helps employees to...",
-        answers: ["Feel worse", "Work better and feel healthier", "Quit their jobs", "Fight each other"],
-        correct: 1
-      },
-      {
-        question: "To 'hire' someone means to...",
-        answers: ["Give them a job", "Send them home", "Sell them a product", "Ask them a question"],
-        correct: 0
-      }
-    ]
-  },
-  {
-    id: 7,
-    name: "Businessperson",
-    icon: "💼",
-    description: "Entrepreneur",
-    questions: [
-      {
-        question: "The money a business earns after paying all costs is called...",
-        answers: ["Debt", "Profit", "Loss", "Tax"],
-        correct: 1
-      },
-      {
-        question: "A company that is just starting is often called a...",
-        answers: ["Start-up", "Finish-line", "Old business", "School"],
-        correct: 0
-      },
-      {
-        question: "Marketing is used to...",
-        answers: ["Hide products", "Attract customers and sell products", "Scare people", "Save money"],
-        correct: 1
-      },
-      {
-        question: "A 'competitor' is...",
-        answers: ["A partner", "Another business selling similar things", "A customer", "A lawyer"],
-        correct: 1
-      },
-      {
-        question: "If you need money to start a business, you might ask a bank for a...",
-        answers: ["Gift", "Loan", "Fine", "Receipt"],
-        correct: 1
-      },
-      {
-        question: "A legal agreement between two businesses is a...",
-        answers: ["Contract", "Novel", "Ticket", "Diary"],
-        correct: 0
-      },
-      {
-        question: "To go 'bankrupt' means...",
-        answers: ["To make a lot of money", "To lose all money and close the business", "To hire more people", "To open a new bank"],
-        correct: 1
-      },
-      {
-        question: "An 'investment' is money used to...",
-        answers: ["Buy lunch", "Make more money in the future", "Pay a fine", "Lose a bet"],
-        correct: 1
-      },
-      {
-        question: "Taxes are money that businesses must pay to...",
-        answers: ["The government", "The customers", "The competitors", "The neighbors"],
-        correct: 0
-      },
-      {
-        question: "The 'CEO' is usually the...",
-        answers: ["Lowest worker", "Highest ranking manager", "Security guard", "Cleaner"],
-        correct: 1
-      }
-    ]
-  }
-];
+    ];
 
+    // === GAME LOGIC ===
     let teams = [];
     let currentTeamIndex = 0;
     let currentQuestionIndex = 0;
     let selectedAnswer = null;
     let teamScores = {};
 
-    function initializeGame() {
+    function initGame() {
       teams = [];
       currentTeamIndex = 0;
       currentQuestionIndex = 0;
       selectedAnswer = null;
-      teamScores = {};
-      renderCareersGrid();
-      updateTeamName();
-      showScreen('teamSelection');
+      renderCareers();
+      document.getElementById('currentTeamName').textContent = `Team 1`;
     }
 
-    function renderCareersGrid() {
+    function renderCareers() {
       const grid = document.getElementById('careersGrid');
       grid.innerHTML = '';
-
-      careers.forEach(career => {
-        const isTaken = teams.some(t => t.careerId === career.id);
-        const card = document.createElement('div');
-        card.className = `career-card ${isTaken ? 'taken' : ''}`;
-        card.innerHTML = `
-          <span class="career-icon">${career.icon}</span>
-          <div class="career-name">${career.name}</div>
-          <div class="career-desc">${career.description}</div>
-        `;
-        
-        if (!isTaken) {
-          card.onclick = () => selectCareer(career.id, card);
-        }
-        
-        grid.appendChild(card);
+      careers.forEach(c => {
+        const isTaken = teams.some(t => t.careerId === c.id);
+        const div = document.createElement('div');
+        div.className = `career-card ${isTaken ? 'taken' : ''}`;
+        div.innerHTML = `<span class="career-icon">${c.icon}</span><div class="career-name">${c.name}</div><div class="career-desc">${c.description}</div>`;
+        if (!isTaken) div.onclick = () => selectCareer(c.id, div);
+        grid.appendChild(div);
       });
     }
 
-    function selectCareer(careerId, cardElement) {
+    function selectCareer(id, el) {
       document.querySelectorAll('.career-card').forEach(c => c.classList.remove('selected'));
-      cardElement.classList.add('selected');
-      selectedAnswer = careerId;
+      el.classList.add('selected');
+      selectedAnswer = id;
       document.getElementById('confirmButton').disabled = false;
     }
 
-    function updateTeamName() {
-      const teamName = `Team ${currentTeamIndex + 1}`;
-      document.getElementById('currentTeamName').textContent = teamName;
-    }
-
     function confirmSelection() {
-      if (selectedAnswer === null) return;
-
       const career = careers.find(c => c.id === selectedAnswer);
-      teams.push({
-        name: `Team ${currentTeamIndex + 1}`,
-        careerId: career.id,
-        careerName: career.name,
-        careerIcon: career.icon,
-        score: 0
-      });
-
-      teamScores[`Team ${currentTeamIndex + 1}`] = 0;
-
+      teams.push({ name: `Team ${teams.length + 1}`, careerId: career.id, careerData: career, score: 0 });
+      
       if (teams.length < 7) {
         currentTeamIndex++;
         selectedAnswer = null;
-        updateTeamName();
-        renderCareersGrid();
+        document.getElementById('currentTeamName').textContent = `Team ${teams.length + 1}`;
         document.getElementById('confirmButton').disabled = true;
+        renderCareers();
       } else {
         startQuiz();
       }
@@ -1160,62 +441,57 @@
 
     function startQuiz() {
       currentTeamIndex = 0;
-      currentQuestionIndex = 0;
+      document.getElementById('teamSelection').classList.add('hidden');
+      document.getElementById('quizScreen').classList.add('active');
       loadQuestion();
-      showScreen('quizScreen');
     }
 
     function loadQuestion() {
       const team = teams[currentTeamIndex];
-      const career = careers.find(c => c.id === team.careerId);
-      const question = career.questions[currentQuestionIndex];
-
+      const q = team.careerData.questions[currentQuestionIndex];
+      
       document.getElementById('quizTeamName').textContent = team.name;
-      document.getElementById('quizCareerName').textContent = `${team.careerIcon} ${team.careerName}`;
-      document.getElementById('questionCounter').textContent = `Question ${currentQuestionIndex + 1} of 10`;
-      document.getElementById('questionText').textContent = question.question;
+      document.getElementById('quizCareerName').textContent = `${team.careerData.icon} ${team.careerData.name}`;
+      document.getElementById('questionCounter').textContent = `Question ${currentQuestionIndex + 1}/10`;
+      document.getElementById('questionText').textContent = q.question;
 
-      const answersGrid = document.getElementById('answersGrid');
-      answersGrid.innerHTML = '';
-
-      question.answers.forEach((answer, index) => {
-        const button = document.createElement('button');
-        button.className = 'answer-button';
-        button.textContent = answer;
-        button.onclick = () => selectAnswerOption(index, button);
-        answersGrid.appendChild(button);
-      });
-
+      const grid = document.getElementById('answersGrid');
+      grid.innerHTML = '';
       selectedAnswer = null;
       document.getElementById('submitButton').disabled = true;
-    }
 
-    function selectAnswerOption(index, buttonElement) {
-      document.querySelectorAll('.answer-button').forEach(btn => {
-        btn.classList.remove('selected');
+      q.answers.forEach((ans, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-button';
+        btn.textContent = ans;
+        btn.onclick = () => {
+          document.querySelectorAll('.answer-button').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedAnswer = idx;
+          document.getElementById('submitButton').disabled = false;
+        };
+        grid.appendChild(btn);
       });
-      buttonElement.classList.add('selected');
-      selectedAnswer = index;
-      document.getElementById('submitButton').disabled = false;
     }
 
     function submitAnswer() {
-      if (selectedAnswer === null) return;
-
       const team = teams[currentTeamIndex];
-      const career = careers.find(c => c.id === team.careerId);
-      const question = career.questions[currentQuestionIndex];
+      const q = team.careerData.questions[currentQuestionIndex];
       const buttons = document.querySelectorAll('.answer-button');
-
-      if (selectedAnswer === question.correct) {
+      
+      const isCorrect = selectedAnswer === q.correct;
+      
+      // Hiệu ứng Visual
+      if (isCorrect) {
         buttons[selectedAnswer].classList.add('correct');
         team.score += 15;
-        teamScores[team.name] += 15;
-        playCorrectSound();
+        showFeedback("✅ Correct! +15", "correct");
+        triggerFireworks();
       } else {
         buttons[selectedAnswer].classList.add('wrong');
-        buttons[question.correct].classList.add('correct');
-        playWrongSound();
+        buttons[q.correct].classList.add('correct');
+        showFeedback("❌ Wrong!", "wrong");
+        triggerShake();
       }
 
       document.getElementById('submitButton').disabled = true;
@@ -1225,6 +501,7 @@
           currentQuestionIndex++;
           loadQuestion();
         } else {
+          // Next team or Finish
           if (currentTeamIndex < teams.length - 1) {
             currentTeamIndex++;
             currentQuestionIndex = 0;
@@ -1233,237 +510,67 @@
             showScoreboard();
           }
         }
-      }, 2000);
+      }, 2000); // Đợi 2 giây để xem kết quả
+    }
+
+    // === EFFECTS ===
+    function showFeedback(text, type) {
+      const popup = document.getElementById('feedbackPopup');
+      popup.textContent = text;
+      popup.className = `feedback-popup ${type} show`;
+      
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 1500);
+    }
+
+    function triggerShake() {
+      const card = document.getElementById('mainCard');
+      card.classList.remove('shake-effect');
+      void card.offsetWidth; // Trigger reflow
+      card.classList.add('shake-effect');
+    }
+
+    function triggerFireworks() {
+      const container = document.getElementById('fireworks');
+      const colors = ['#f093fb', '#f5576c', '#4facfe', '#43e97b', '#fa709a', '#fee140'];
+      
+      for(let i=0; i<30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const x = (Math.random() - 0.5) * 400 + 'px';
+        const y = (Math.random() - 0.5) * 400 + 'px';
+        p.style.setProperty('--x', x);
+        p.style.setProperty('--y', y);
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = '50%';
+        p.style.top = '50%';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
     }
 
     function showScoreboard() {
-      const sortedTeams = [...teams].sort((a, b) => b.score - a.score);
-      const winner = sortedTeams[0];
-
-      document.getElementById('winnerMessage').textContent = 
-        `🎉 Congratulations ${winner.name} (${winner.careerIcon} ${winner.careerName})! You are the Winner! 🎉`;
-
-      const scoresList = document.getElementById('scoresList');
-      scoresList.innerHTML = '';
-
-      sortedTeams.forEach((team, index) => {
-        const item = document.createElement('div');
-        item.className = `score-item rank-${index + 1}`;
-        item.innerHTML = `
-          <div class="score-left">
-            <div class="rank-badge">${index === 0 ? '🏆' : index + 1}</div>
-            <div class="team-details">
-              <div class="team-name-score">${team.name}</div>
-              <div class="career-name-score">${team.careerIcon} ${team.careerName}</div>
-            </div>
-          </div>
-          <div class="score-points">${team.score}</div>
-        `;
-        scoresList.appendChild(item);
-      });
-
-      showScreen('scoreboardScreen');
-      createFireworks();
-    }
-
-    function createFireworks() {
-      const container = document.getElementById('fireworks');
-      container.innerHTML = '';
-
-      const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f093fb', '#4facfe'];
-
-      for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-          const x = Math.random() * window.innerWidth;
-          const y = Math.random() * window.innerHeight * 0.6;
-
-          for (let j = 0; j < 12; j++) {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.left = x + 'px';
-            firework.style.top = y + 'px';
-            firework.style.background = colors[Math.floor(Math.random() * colors.length)];
-
-            const angle = (j / 12) * Math.PI * 2;
-            const velocity = 50 + Math.random() * 100;
-            firework.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
-            firework.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
-
-            container.appendChild(firework);
-
-            setTimeout(() => firework.remove(), 1500);
-          }
-        }, i * 200);
-      }
-    }
-
-    function playCorrectSound() {
-      // Simulate correct sound with visual feedback
-      console.log('✓ Correct!');
-    }
-
-    function playWrongSound() {
-      // Simulate wrong sound with visual feedback
-      console.log('✗ Wrong!');
-    }
-
-    function showScreen(screenName) {
-      document.getElementById('teamSelection').classList.remove('active');
       document.getElementById('quizScreen').classList.remove('active');
-      document.getElementById('scoreboardScreen').classList.remove('active');
+      document.getElementById('scoreboardScreen').classList.add('active');
+      
+      teams.sort((a,b) => b.score - a.score);
+      const winner = teams[0];
+      document.getElementById('winnerMessage').textContent = `🎉 WINNER: ${winner.name} (${winner.careerData.name}) - ${winner.score} PTS`;
 
-      if (screenName === 'teamSelection') {
-        document.getElementById('teamSelection').style.display = 'block';
-      } else {
-        document.getElementById('teamSelection').style.display = 'none';
-      }
-
-      if (screenName === 'quizScreen') {
-        document.getElementById('quizScreen').classList.add('active');
-      }
-
-      if (screenName === 'scoreboardScreen') {
-        document.getElementById('scoreboardScreen').classList.add('active');
-      }
+      const list = document.getElementById('scoresList');
+      teams.forEach((t, i) => {
+        const div = document.createElement('div');
+        div.className = `score-item rank-${i+1}`;
+        div.innerHTML = `<span><b>#${i+1}</b> ${t.name} (${t.careerData.icon})</span> <strong>${t.score}</strong>`;
+        list.appendChild(div);
+      });
+      
+      // Bắn pháo hoa lớn
+      setInterval(triggerFireworks, 500);
     }
 
-    function restartGame() {
-      document.getElementById('fireworks').innerHTML = '';
-      initializeGame();
-    }
-
-    async function onConfigChange(config) {
-      const gameTitle = document.getElementById('gameTitle');
-      const instructionText = document.getElementById('instructionText');
-
-      if (gameTitle) {
-        gameTitle.textContent = config.game_title || defaultConfig.game_title;
-      }
-
-      if (instructionText) {
-        instructionText.textContent = config.instruction_text || defaultConfig.instruction_text;
-      }
-
-      const backgroundColor = config.background_color || defaultConfig.background_color;
-      const surfaceColor = config.surface_color || defaultConfig.surface_color;
-      const textColor = config.text_color || defaultConfig.text_color;
-      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
-      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
-
-      document.body.style.background = `linear-gradient(135deg, ${backgroundColor} 0%, ${backgroundColor}dd 100%)`;
-
-      const gameCard = document.querySelector('.game-card');
-      if (gameCard) {
-        gameCard.style.background = surfaceColor;
-      }
-
-      const textElements = document.querySelectorAll('.game-title, .question-text, .team-name-score, .scoreboard-title');
-      textElements.forEach(el => {
-        el.style.color = textColor;
-      });
-
-      const primaryButtons = document.querySelectorAll('.submit-answer-button, .restart-game-button, .current-team-banner, .rank-badge');
-      primaryButtons.forEach(btn => {
-        btn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`;
-      });
-
-      const secondaryButtons = document.querySelectorAll('.confirm-button, .winner-message');
-      secondaryButtons.forEach(btn => {
-        btn.style.background = `linear-gradient(135deg, ${secondaryColor} 0%, ${secondaryColor}dd 100%)`;
-      });
-
-      const customFont = config.font_family || defaultConfig.font_family;
-      const baseFontSize = config.font_size || defaultConfig.font_size;
-      const baseFontStack = 'Nunito, Segoe UI, sans-serif';
-
-      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
-
-      if (gameTitle) {
-        gameTitle.style.fontSize = `${baseFontSize * 2.625}px`;
-      }
-
-      if (instructionText) {
-        instructionText.style.fontSize = `${baseFontSize * 1.125}px`;
-      }
-
-      const questionTexts = document.querySelectorAll('.question-text');
-      questionTexts.forEach(el => {
-        el.style.fontSize = `${baseFontSize * 1.5}px`;
-      });
-
-      const answerButtons = document.querySelectorAll('.answer-button');
-      answerButtons.forEach(el => {
-        el.style.fontSize = `${baseFontSize * 1.0625}px`;
-      });
-    }
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities: (config) => ({
-          recolorables: [
-            {
-              get: () => config.background_color || defaultConfig.background_color,
-              set: (value) => {
-                config.background_color = value;
-                window.elementSdk.setConfig({ background_color: value });
-              }
-            },
-            {
-              get: () => config.surface_color || defaultConfig.surface_color,
-              set: (value) => {
-                config.surface_color = value;
-                window.elementSdk.setConfig({ surface_color: value });
-              }
-            },
-            {
-              get: () => config.text_color || defaultConfig.text_color,
-              set: (value) => {
-                config.text_color = value;
-                window.elementSdk.setConfig({ text_color: value });
-              }
-            },
-            {
-              get: () => config.primary_action_color || defaultConfig.primary_action_color,
-              set: (value) => {
-                config.primary_action_color = value;
-                window.elementSdk.setConfig({ primary_action_color: value });
-              }
-            },
-            {
-              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
-              set: (value) => {
-                config.secondary_action_color = value;
-                window.elementSdk.setConfig({ secondary_action_color: value });
-              }
-            }
-          ],
-          borderables: [],
-          fontEditable: {
-            get: () => config.font_family || defaultConfig.font_family,
-            set: (value) => {
-              config.font_family = value;
-              window.elementSdk.setConfig({ font_family: value });
-            }
-          },
-          fontSizeable: {
-            get: () => config.font_size || defaultConfig.font_size,
-            set: (value) => {
-              config.font_size = value;
-              window.elementSdk.setConfig({ font_size: value });
-            }
-          }
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ["game_title", config.game_title || defaultConfig.game_title],
-          ["instruction_text", config.instruction_text || defaultConfig.instruction_text],
-          ["winner_message", config.winner_message || defaultConfig.winner_message]
-        ])
-      });
-    }
-
-    initializeGame();
+    initGame();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a49884b75eeca12',t:'MTc2NDE2MTY0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ </body>
 </html>
