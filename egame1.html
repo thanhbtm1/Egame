@@ -1816,7 +1816,7 @@
    <div class="game-card">
     <div class="game-header">
      <h1 class="game-title" id="gameTitle">🎮 Career Path Quiz Game Pro</h1>
-     <p class="game-subtitle" id="instructionText">6 Teams • 6 Careers • 5 Questions + Bonus</p>
+     <p class="game-subtitle" id="instructionText">6 Teams • 6 Careers • 7 Questions + Bonus</p>
     </div><!-- Home Screen -->
     <div class="home-screen" id="homeScreen">
      <div class="welcome-icon">
@@ -1962,7 +1962,7 @@
   <script>
     const defaultConfig = {
       game_title: "🎮 Career Path Quiz Game Pro",
-      instruction_text: "6 Teams • 6 Careers • 5 Questions + Bonus",
+      instruction_text: "6 Teams • 6 Careers • 7 Questions + Bonus",
       winner_message: "🎉 Congratulations! You are the Winner! 🎉",
       discussion_time: "30",
       background_color: "#667eea",
@@ -1990,6 +1990,11 @@
         icon: "👨‍⚕️",
         description: "Healthcare Hero",
         questions: [
+          {
+            question: "She thought she ______ be a famous singer, but she became a Doctor instead.",
+            answers: ["would", "is going to", "will", "were going to"],
+            correct: 0
+          },
           {
             question: "If a patient complains of persistent headaches and dizziness, what should a doctor do first?",
             answers: ["Prescribe pain medication immediately", "Conduct a thorough examination and medical history", "Send them home to rest", "Recommend surgery right away"],
@@ -2020,7 +2025,7 @@
             answers: ["Perfect memory for all medical facts", "Compassion combined with clinical expertise", "Ability to work without sleep", "Never showing emotion to patients"],
             correct: 1,
             isBonus: true
-          }
+          },
         ]
       },
       {
@@ -2029,6 +2034,7 @@
         icon: "👨‍💻",
         description: "Code Creator",
         questions: [
+          
           {
             question: "What is the purpose of 'debugging' in software development?",
             answers: ["Creating new features quickly", "Identifying and fixing errors in code", "Making programs run slower", "Deleting unnecessary files"],
@@ -2047,6 +2053,11 @@
           {
             question: "When should a programmer refactor their code?",
             answers: ["Never, if it works don't change it", "When code becomes difficult to maintain or understand", "Only at the end of a project", "Every single day without exception"],
+            correct: 1
+          },
+          {
+            question: "I ______ call you, but I completely forgot because I was so busy.",
+            answers: ["would", "was going to", "am going to", "will"],
             correct: 1
           },
           {
@@ -2081,6 +2092,11 @@
           {
             question: "What should a content creator consider when collaborating with brands?",
             answers: ["Only the payment amount", "Brand alignment with their values and audience", "Taking every opportunity offered", "Ignoring audience feedback completely"],
+            correct: 1
+          },
+          {
+            question: "______ you ______ to apply for that job? – 'Yes, I was. But I missed the deadline.'",
+            answers: ["Was / going", "Were / going", "Did / go", "Would / go"],
             correct: 1
           },
           {
@@ -2128,6 +2144,11 @@
             correct: 0
           },
           {
+            question: "They said they ______ arrive before noon, but they didn't show up until 2 PM.",
+            answers: ["were going to", "would be", "are going to", "Both A & B are correct"],
+            correct: 0
+          },
+          {
             question: "What is the difference between 'hard selling' and 'consultative selling'?",
             answers: ["One is difficult, one is easy", "Hard selling pushes products; consultative focuses on customer needs", "They are exactly the same approach", "Consultative selling is outdated"],
             correct: 1
@@ -2172,6 +2193,11 @@
             correct: 1
           },
           {
+            question: "We ______ visit our grandparents last weekend, but my car broke down.",
+            answers: ["would", "are going to", "were going to", "will"],
+            correct: 2
+          },
+          {
             question: "BONUS: What leadership style is most effective in modern workplaces?",
             answers: ["Authoritarian control", "Adaptive leadership that adjusts to team and situation", "Completely hands-off approach", "Micromanaging every detail"],
             correct: 1,
@@ -2206,6 +2232,11 @@
             correct: 1
           },
           {
+            question: "I ______ start my diet yesterday, but my friends invited me to a big party.",
+            answers: ["would", "am going to", "was going to", "will"],
+            correct: 2
+          },
+          {
             question: "How should entrepreneurs respond to business failures?",
             answers: ["Give up immediately and never try again", "Learn from mistakes and adapt their approach", "Blame others for the problems", "Ignore what went wrong"],
             correct: 1
@@ -2223,9 +2254,9 @@
     // Career Future Questions for Lucky Boxes
     const careerFutureQuestions = [
       {
-        question: "What is the MOST important factor when choosing a career path?",
-        answers: ["Only the salary and benefits", "Alignment with your interests, values, and long-term goals", "What your parents want you to do", "Choosing the easiest option available"],
-        correct: 1
+          question: "I believed that we ______ win the game, but the other team was too strong.",
+          answers: ["were going to", "would", "are going to", "will"],
+          correct: 1
       },
       {
         question: "Why is lifelong learning essential for career success?",
@@ -2238,9 +2269,9 @@
         correct: 1
       },
       {
-        question: "How can networking benefit your career development?",
-        answers: ["It's a waste of time and energy", "It opens doors to opportunities, mentorship, and industry insights", "It only works for extroverted people", "It's just about collecting business cards"],
-        correct: 1
+          question: "Jack ______ paint his room blue, but he decided to paint it white at the last minute.",
+          answers: ["would", "is going to", "was going to", "will"],
+          correct: 2
       },
       {
         question: "What role does work-life balance play in long-term career satisfaction?",
@@ -2248,9 +2279,9 @@
         correct: 1
       },
       {
-        question: "Why is developing soft skills (communication, teamwork) important for any career?",
-        answers: ["They're not important, only technical skills matter", "They enable effective collaboration and career advancement", "They're only needed in customer service roles", "They can't be learned or improved"],
-        correct: 1
+          question: "We always thought they ______ get married, but they broke up last month.",
+          answers: ["are going to", "would", "were going to", "will"],
+          correct: 1
       },
       {
         question: "What's the best approach when facing setbacks in your career?",
@@ -2263,14 +2294,245 @@
         correct: 1
       },
       {
-        question: "What is the value of gaining diverse work experiences early in your career?",
-        answers: ["It makes you look unfocused", "It helps you discover strengths and find the right career fit", "You should only have one job ever", "Employers don't value varied experience"],
-        correct: 1
+          question: "Who ______ teach this class? I thought Mr. Smith was the teacher.",
+          answers: ["was going to", "would", "is going to", "will"],
+          correct: 0
       },
       {
         question: "Why should you set career goals for yourself?",
         answers: ["Goals limit your opportunities", "They provide direction, motivation, and measurable progress", "Only companies should set goals for you", "Goals create unnecessary pressure"],
         correct: 1
+      },
+      {
+        question: "What should you do if you realize your chosen career isn't right for you?",
+        answers: ["Stick with it no matter what", "Assess your options and pivot if needed", "Quit working entirely", "Blame other people"],
+        correct: 1
+      },
+      {
+        question: "I thought I ______ get promoted last year, but it didn’t happen.",
+        answers: ["was going to", "am going to", "will", "would be"],
+        correct: 0
+      },
+      {
+        question: "Why is communication important in the workplace?",
+        answers: ["It helps avoid misunderstandings", "It makes people argue more", "It reduces teamwork", "It has no real purpose"],
+        correct: 0
+      },
+      {
+        question: "She believed she ______ move abroad for her career, but plans changed.",
+        answers: ["would", "is going to", "was going to", "will"],
+        correct: 2
+      },
+      {
+        question: "What is one benefit of choosing a career that matches your strengths?",
+        answers: ["You'll perform better and feel more motivated", "You'll never face challenges", "You'll become famous instantly", "You won’t need to learn new skills"],
+        correct: 0
+      },
+      {
+        question: "We ______ start a small business, but the economy was unstable.",
+        answers: ["will", "were going to", "are going to", "would"],
+        correct: 1
+      },
+      {
+        question: "Why is networking useful for career growth?",
+        answers: ["It helps you build opportunities", "It wastes time", "It is only for rich people", "It replaces all skills"],
+        correct: 0
+      },
+      {
+        question: "Jack ______ apply for a new position, but he changed his mind.",
+        answers: ["is going to", "was going to", "will", "would"],
+        correct: 1
+      },
+      {
+        question: "What should you do when preparing for a job interview?",
+        answers: ["Research the company", "Ignore the job requirements", "Arrive late", "Speak negatively about others"],
+        correct: 0
+      },
+      {
+        question: "They thought the company ______ expand internationally.",
+        answers: ["was going to", "will", "is going to", "would"],
+        correct: 3
+      },
+    
+      {
+        question: "Why is time management essential for career success?",
+        answers: ["It improves productivity", "It makes work harder", "It reduces performance", "It increases stress"],
+        correct: 0
+      },
+      {
+        question: "I ______ start an online course, but I forgot to register.",
+        answers: ["was going to", "would", "am going to", "will"],
+        correct: 0
+      },
+      {
+        question: "What should you do if you feel unmotivated at work?",
+        answers: ["Identify the cause and adjust your routine", "Quit immediately", "Ignore your feelings", "Blame your coworkers"],
+        correct: 0
+      },
+      {
+        question: "She said she ______ change careers this year.",
+        answers: ["was going to", "would", "is going to", "will"],
+        correct: 0
+      },
+      {
+        question: "Why is adaptability important in modern careers?",
+        answers: ["Jobs and technologies change quickly", "It is not important", "It only matters in school", "It reduces job opportunities"],
+        correct: 0
+      },
+      {
+        question: "I thought you ______ take the leadership role.",
+        answers: ["will", "are going to", "were going to", "would"],
+        correct: 2
+      },
+      {
+        question: "What is a good reason to set career goals?",
+        answers: ["They help you stay focused and motivated", "They limit your success", "They cause stress", "They prevent progress"],
+        correct: 0
+      },
+      {
+        question: "We always believed she ______ become a designer.",
+        answers: ["would", "is going to", "was going to", "will"],
+        correct: 0
+      },
+      {
+        question: "Why should you develop your soft skills?",
+        answers: ["They improve teamwork and communication", "They only matter for managers", "They replace technical skills", "They are unnecessary"],
+        correct: 0
+      },
+      {
+        question: "I ______ join the training program, but it got canceled.",
+        answers: ["am going to", "was going to", "will", "would"],
+        correct: 1
+      },
+    
+      {
+        question: "What is a sign that a career suits you?",
+        answers: ["You enjoy the work and feel engaged", "You always feel bored", "You hate every task", "You avoid learning new things"],
+        correct: 0
+      },
+      {
+        question: "They ______ hire more staff, but budgets were cut.",
+        answers: ["will", "are going to", "were going to", "would"],
+        correct: 2
+      },
+      {
+        question: "Why is problem-solving an important skill?",
+        answers: ["It helps you handle challenges effectively", "It makes work slower", "It causes confusion", "It is rarely used at work"],
+        correct: 0
+      },
+      {
+        question: "I thought she ______ start her own business.",
+        answers: ["was going to", "will", "would", "is going to"],
+        correct: 0
+      },
+      {
+        question: "What should you do if you want a promotion?",
+        answers: ["Improve your skills and show responsibility", "Do the bare minimum", "Avoid new tasks", "Arrive late often"],
+        correct: 0
+      },
+    
+      {
+        question: "He ______ study marketing, but later switched to finance.",
+        answers: ["would", "was going to", "will", "is going to"],
+        correct: 1
+      },
+      {
+        question: "Why is self-discipline important in career success?",
+        answers: ["It helps you stay consistent and reliable", "It makes work boring", "It slows you down", "It prevents creativity"],
+        correct: 0
+      },
+      {
+        question: "We ______ open a café, but the rent was too high.",
+        answers: ["would", "were going to", "will", "are going to"],
+        correct: 1
+      },
+      {
+        question: "What should you do if you fail at something in your career?",
+        answers: ["Learn from it and try again", "Give up immediately", "Blame others", "Avoid future learning"],
+        correct: 0
+      },
+      {
+        question: "I thought you ______ become a doctor someday.",
+        answers: ["were going to", "will", "would", "are going to"],
+        correct: 2
+      },
+    
+      {
+        question: "What is the advantage of having a mentor?",
+        answers: ["They provide guidance and experience", "They make decisions for you", "They prevent you from growing", "They replace hard work"],
+        correct: 0
+      },
+      {
+        question: "She ______ start a new project, but another team took over.",
+        answers: ["is going to", "was going to", "will", "would"],
+        correct: 1
+      },
+      {
+        question: "Why is critical thinking valuable?",
+        answers: ["It helps you analyze information clearly", "It wastes time", "It is only for scientists", "It causes confusion"],
+        correct: 0
+      },
+      {
+        question: "We believed the company ______ create new jobs.",
+        answers: ["will", "would", "is going to", "was going to"],
+        correct: 1
+      },
+      {
+        question: "What should you do to build confidence at work?",
+        answers: ["Practice regularly and take small challenges", "Avoid responsibilities", "Ignore feedback", "Compare yourself to others constantly"],
+        correct: 0
+      },
+    
+      {
+        question: "The manager said the team ______ move to a new office.",
+        answers: ["will", "is going to", "was going to", "would"],
+        correct: 2
+      },
+      {
+        question: "Why should you update your CV regularly?",
+        answers: ["To reflect new skills and achievements", "To impress friends", "Because employers demand weekly updates", "To make it longer only"],
+        correct: 0
+      },
+      {
+        question: "He ______ quit his job, but he got promoted unexpectedly.",
+        answers: ["would", "is going to", "was going to", "will"],
+        correct: 2
+      },
+      {
+        question: "Why is teamwork important?",
+        answers: ["It helps complete tasks more effectively", "It slows the project down", "It causes conflict by default", "It removes individual responsibility"],
+        correct: 0
+      },
+      {
+        question: "They thought she ______ change departments last month.",
+        answers: ["was going to", "will", "would", "is going to"],
+        correct: 2
+      },
+    
+      {
+        question: "What should you do if you want to improve your career skills?",
+        answers: ["Join courses or training programs", "Wait for someone to teach you", "Avoid new knowledge", "Stop practicing"],
+        correct: 0
+      },
+      {
+        question: "I ______ sign the contract, but I needed more time to think.",
+        answers: ["am going to", "will", "was going to", "would"],
+        correct: 2
+      },
+      {
+        question: "Why is goal-setting helpful?",
+        answers: ["It gives direction and motivation", "It limits creativity", "It is unnecessary pressure", "It wastes time"],
+        correct: 0
+      },
+      {
+        question: "She ______ work abroad, but her visa was rejected.",
+        answers: ["would", "was going to", "will", "is going to"],
+        correct: 1
+      },
+      {
+        question: "What is a good way to handle workplace stress?",
+        answers: ["Take breaks and manage workload", "Ignore all deadlines", "Work nonstop", "Complain constantly"],
+        correct: 0
       }
     ];
 
@@ -5090,7 +5352,7 @@
   <script>
     const defaultConfig = {
       game_title: "🎮 Career Path Quiz Game Pro",
-      instruction_text: "6 Teams • 6 Careers • 5 Questions + Bonus",
+      instruction_text: "6 Teams • 6 Careers • 7 Questions + Bonus",
       winner_message: "🎉 Congratulations! You are the Winner! 🎉",
       discussion_time: "30",
       background_color: "#667eea",
