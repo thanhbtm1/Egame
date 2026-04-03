@@ -30,7 +30,8 @@
             transition: box-shadow 0.3s ease;
         }
 
-        body.time-warning { box-shadow: inset 0 0 80px 20px rgba(255, 0, 0, 0.8); }
+        /* TIMER WARNING EFFECT */
+        body.time-warning { box-shadow: inset 0 0 100px 30px rgba(255, 0, 0, 0.9); }
 
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
@@ -74,8 +75,7 @@
         }
         .score-card {
             background: rgba(0, 0, 0, 0.6); border: 2px solid var(--accent2);
-            border-radius: 15px; padding: 15px; text-align: center;
-            transition: 0.3s;
+            border-radius: 15px; padding: 10px; text-align: center; transition: 0.3s;
         }
         .score-card.active {
             border-color: var(--success); box-shadow: 0 0 20px rgba(0,255,102,0.4);
@@ -83,12 +83,13 @@
         }
         .score-team-name { font-size: 1.2rem; font-weight: bold; color: #ffdf00; margin-bottom: 5px; text-transform: uppercase; }
         .score-points { font-size: 2.5rem; font-weight: 900; color: white; text-shadow: 2px 2px 4px black; }
+        .score-streak { font-size: 1rem; color: #ff007b; font-weight: bold; margin-top: 5px; }
 
         .steal-badge { display: inline-block; background: #ffdf00; color: black; font-size: 1rem; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; animation: pulse 0.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         /* Lifelines & Timer */
-        .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .timer { font-size: 2.5rem; font-weight: bold; color: white; background: rgba(0,0,0,0.5); padding: 5px 30px; border-radius: 20px; border: 2px solid var(--accent2); }
         .timer.warning { color: white; background: var(--warning); border-color: var(--warning); animation: pulse 0.5s infinite; box-shadow: 0 0 20px var(--warning); }
 
@@ -96,11 +97,11 @@
         .btn-lifeline { background: linear-gradient(45deg, #8e2de2, #4a00e0); color: white; border: 2px solid #fff; padding: 10px 20px; border-radius: 15px; font-weight: bold; font-size: 1rem; }
         .btn-lifeline.used { background: #555; color: #888; border-color: #444; text-decoration: line-through; }
 
-        /* GRID (28 Boxes) */
-        .grid-area { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 10px; }
+        /* GRID (28 Boxes: 7x4) */
+        .grid-area { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 10px; }
         .grid-box {
             background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(255,0,123,0.2));
-            border: 2px dashed var(--accent2); border-radius: 15px; padding: 25px 10px;
+            border: 2px dashed var(--accent2); border-radius: 15px; padding: 20px 10px;
             font-size: 2rem; font-weight: bold; color: #fff; text-align: center;
             cursor: pointer; transition: 0.3s; text-shadow: 0 0 10px var(--accent2);
         }
@@ -109,7 +110,7 @@
 
         /* Question Area */
         .question-area { display: none; background: linear-gradient(135deg, rgba(255,0,123,0.3), rgba(0,240,255,0.3)); padding: 40px; border-radius: 20px; text-align: center; border: 2px solid rgba(255,255,255,0.4); position: relative; }
-        .question-text { font-size: 2rem; margin-bottom: 40px; font-weight: bold; text-shadow: 1px 1px 3px black; }
+        .question-text { font-size: 1.8rem; margin-bottom: 40px; font-weight: bold; text-shadow: 1px 1px 3px black; line-height: 1.4; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .option-btn {
             background: rgba(0,0,0,0.6); border: 2px solid var(--accent2); color: white; padding: 20px; font-size: 1.3rem; 
@@ -119,6 +120,8 @@
         .option-btn.correct { background: var(--success); color: black; border-color: white; transform: scale(1.05); box-shadow: 0 0 30px var(--success); }
         .option-btn.wrong { background: var(--warning); color: white; border-color: white; opacity: 0.6; }
         .option-btn.disabled-5050 { opacity: 0.2; pointer-events: none; }
+        .penalty-text { color: var(--warning); font-size: 1.5rem; font-weight: bold; margin-top: 15px; text-shadow: 2px 2px 5px black; animation: pulse 0.5s; display: none; }
+        
         .combo-badge { position: absolute; top: -20px; right: 20px; background: #ffdf00; color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1rem; box-shadow: 0 0 15px #ffdf00; display: none; z-index: 10; }
 
         /* Event Area */
@@ -197,6 +200,7 @@
             <div class="combo-badge" id="combo-badge">COMBO X3 🔥</div>
             <div class="question-text" id="q-text">Loading...</div>
             <div class="options-grid" id="options-area"></div>
+            <div class="penalty-text" id="penalty-text"></div>
         </div>
         
         <div class="event-area" id="event-area">
@@ -216,6 +220,14 @@
         <button class="btn-main" onclick="location.reload()" style="margin-top: 30px;">PLAY AGAIN</button>
     </div>
 
+    <div id="custom-alert-modal" class="modal">
+        <div class="modal-content" style="max-width: 450px; border-color: #ffdf00; padding: 40px;">
+            <h2 style="color: #ffdf00; margin-top: 0;">🔔 NOTICE</h2>
+            <div id="custom-alert-text" style="font-size: 1.5rem; margin-bottom: 30px; font-weight: bold; line-height: 1.4;"></div>
+            <button class="btn-main" id="custom-alert-btn">AWESOME!</button>
+        </div>
+    </div>
+
     <div id="team-select-modal" class="modal">
         <div class="modal-content">
             <h2 style="color: var(--accent2); font-size: 2.5rem; margin-top: 0;">🎯 SELECT A TEAM</h2>
@@ -228,7 +240,7 @@
     <div id="steal-modal" class="modal">
         <div class="modal-content">
             <h2 style="color: var(--accent1); font-size: 2.5rem; margin-top: 0;">⚡ STEAL THE TURN</h2>
-            <p style="font-size: 1.2rem; color: #ccc;">Select the fastest team to raise their hand:</p>
+            <p style="font-size: 1.2rem; color: #ccc;">Select the fastest team to answer:</p>
             <div class="team-select-grid" id="steal-options"></div>
             <button class="btn-main" style="background: #555; margin-top: 20px;" onclick="nobodySteals()">NO ONE STEALS</button>
         </div>
@@ -236,16 +248,16 @@
 
     <div id="call-modal" class="modal">
         <div class="modal-content">
-            <h2 style="color: var(--accent2);">📞 LIFELINE</h2>
-            <div id="call-content" style="font-size: 1.5rem; font-weight: bold; padding: 20px; line-height: 1.5;"></div>
-            <button class="btn-main" onclick="document.getElementById('call-modal').style.display='none'">GOT IT!</button>
+            <h2 style="color: var(--accent2);">📞 CALL MR. DAM</h2>
+            <div id="call-content" style="font-size: 1.5rem; font-weight: bold; padding: 20px; line-height: 1.5; font-style: italic;"></div>
+            <button class="btn-main" onclick="document.getElementById('call-modal').style.display='none'">THANK YOU!</button>
         </div>
     </div>
 
     <div id="gift-modal" class="modal">
         <div class="modal-content">
             <h2 style="color: #ffdf00; font-size: 2.5rem; margin-top: 0;">🎁 COMBO REWARD</h2>
-            <p style="color:white; font-size: 1.2rem;">Pick a mystery box:</p>
+            <p style="color:white; font-size: 1.2rem;">Pick a mystery box to reveal your fate:</p>
             <div class="gift-container" id="gift-options-box">
                 <div class="gift-icon" onclick="openComboGift()">📦</div>
                 <div class="gift-icon" onclick="openComboGift()">📦</div>
@@ -260,65 +272,105 @@
         const playSound = (id) => { document.getElementById(id).currentTime = 0; document.getElementById(id).play().catch(()=>{}); }
         const fireConfetti = () => { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999 }); }
 
-        // 20 Questions
-        const qList = [
-            { q: "What is the synonym of 'Happy'?", options: ["Sad", "Joyful", "Angry", "Tired"], correct: 1 },
-            { q: "Which animal is known as the King of the Jungle?", options: ["Tiger", "Lion", "Elephant", "Bear"], correct: 1 },
-            { q: "What is the past tense of 'Go'?", options: ["Goed", "Going", "Went", "Gone"], correct: 2 },
-            { q: "How many days are in a leap year?", options: ["364", "365", "366", "367"], correct: 2 },
-            { q: "Which planet is known as the Red Planet?", options: ["Venus", "Mars", "Jupiter", "Saturn"], correct: 1 },
-            { q: "What is the opposite of 'Difficult'?", options: ["Hard", "Complex", "Easy", "Tough"], correct: 2 },
-            { q: "Who wrote 'Romeo and Juliet'?", options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "J.K. Rowling"], correct: 1 },
-            { q: "Which is the largest ocean on Earth?", options: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3 },
-            { q: "What do bees make?", options: ["Milk", "Honey", "Silk", "Webs"], correct: 1 },
-            { q: "How many legs does a spider have?", options: ["6", "8", "10", "12"], correct: 1 },
-            { q: "What is the capital of Japan?", options: ["Seoul", "Beijing", "Tokyo", "Bangkok"], correct: 2 },
-            { q: "Which word is a noun?", options: ["Run", "Beautiful", "Quickly", "Table"], correct: 3 },
-            { q: "What is freezing point of water?", options: ["0°C", "10°C", "50°C", "100°C"], correct: 0 },
-            { q: "Find the odd one out:", options: ["Apple", "Banana", "Carrot", "Mango"], correct: 2 },
-            { q: "What is the fastest land animal?", options: ["Lion", "Cheetah", "Horse", "Leopard"], correct: 1 },
-            { q: "Which month has the shortest number of days?", options: ["January", "February", "March", "April"], correct: 1 },
-            { q: "What colors make green?", options: ["Red & Blue", "Blue & Yellow", "Red & Yellow", "Black & White"], correct: 1 },
-            { q: "What is 15 multiplied by 3?", options: ["35", "40", "45", "50"], correct: 2 },
-            { q: "Where is the Eiffel Tower located?", options: ["London", "Berlin", "Rome", "Paris"], correct: 3 },
-            { q: "Which gas do humans breathe in to survive?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Helium"], correct: 0 }
+        function showCustomAlert(msg, btnText, callback) {
+            document.getElementById('custom-alert-text').innerText = msg;
+            const btn = document.getElementById('custom-alert-btn');
+            btn.innerText = btnText || "OKAY";
+            document.getElementById('custom-alert-modal').style.display = 'flex';
+            btn.onclick = () => {
+                document.getElementById('custom-alert-modal').style.display = 'none';
+                if(callback) callback();
+            };
+        }
+
+        // 24 Questions
+        const rawQList = [
+            { q: "At the airport, the officer decided to ______ my liquids because they were over the limit.", opts: ["reimburse", "confiscate", "encrypt", "receive"], ans: "confiscate" },
+            { q: "You should keep your ______ as proof if you want a refund.", opts: ["tickets", "luggage", "receipts", "passports"], ans: "receipts" },
+            { q: "The airline will ______ you for the damaged suitcase.", opts: ["reimburse", "remove", "protect", "confirm"], ans: "reimburse" },
+            { q: "Before traveling, I always prepare a detailed ______.", opts: ["identity theft", "travel itinerary", "encryption", "airport code"], ans: "travel itinerary" },
+            { q: "Many travelers worry about ______ when using public Wi-Fi.", opts: ["lost luggage", "identity theft", "travel delay", "boarding pass"], ans: "identity theft" },
+            { q: "______ is used to protect personal data online.", opts: ["Refund", "Receipt", "Encryption", "Baggage"], ans: "Encryption" },
+            { q: "The security staff ______ several prohibited items from his bag.", opts: ["reimbursed", "confiscated", "returned", "borrowed"], ans: "confiscated" },
+            { q: "He showed the hotel his ______ to prove he had already paid.", opts: ["receipt", "itinerary", "luggage", "ticket"], ans: "receipt" },
+            { q: "If your flight is canceled, the airline may ______ your costs.", opts: ["destroy", "delay", "reimburse", "carry"], ans: "reimburse" },
+            { q: "Her ______ included visits to three different cities.", opts: ["encryption", "identity theft", "travel itinerary", "airport rule"], ans: "travel itinerary" },
+            { q: "The officer suspected ______ after seeing unusual activity on his account.", opts: ["luggage loss", "identity theft", "boarding delay", "travel plan"], ans: "identity theft" },
+            { q: "Strong ______ helps keep your data safe from hackers.", opts: ["receipt", "itinerary", "encryption", "refund"], ans: "encryption" },
+            { q: "The airport staff refused to ______ the lost items because there was no proof.", opts: ["reimburse", "confiscate", "protect", "return"], ans: "reimburse" },
+            { q: "He forgot to bring his ______, so he couldn't get a refund.", opts: ["luggage", "receipts", "passport", "ticket"], ans: "receipts" },
+            { q: "Some food was ______ at customs because it was not allowed.", opts: ["returned", "reimbursed", "confiscated", "packed"], ans: "confiscated" },
+            { q: "Without a clear ______, the trip became confusing and stressful.", opts: ["encryption", "itinerary", "receipt", "identity"], ans: "itinerary" },
+            { q: "He was worried about ______ after using a public computer.", opts: ["reimbursement", "identity theft", "travel delay", "lost luggage"], ans: "identity theft" },
+            { q: "If I ______ more careful, I wouldn’t lose my passport.", opts: ["am", "were", "was", "be"], ans: "were" },
+            { q: "If he had checked his luggage, he ______ it.", opts: ["won’t lose", "wouldn’t lose", "wouldn’t have lost", "didn’t lose"], ans: "wouldn’t have lost" },
+            { q: "If we ______ earlier, we would catch the flight now.", opts: ["leave", "left", "had left", "leaving"], ans: "had left" },
+            { q: "If I had a map, I ______ get lost.", opts: ["won’t", "wouldn’t", "didn’t", "don’t"], ans: "wouldn’t" },
+            { q: "If only I ______ my ticket carefully, I wouldn’t have gone to the wrong gate.", opts: ["check", "checked", "had checked", "checking"], ans: "had checked" },
+            { q: "If she ______ more money, she would travel more comfortably.", opts: ["has", "had", "have", "having"], ans: "had" },
+            { q: "If only the staff ______ more helpful, the situation wouldn’t be so stressful.", opts: ["are", "were", "was", "be"], ans: "were" }
         ];
 
-        // 8 Events/Challenges
+        let shuffledQs = [...rawQList].sort(() => Math.random() - 0.5);
+        let qList = shuffledQs.map(item => {
+            let sOpts = [...item.opts].sort(() => Math.random() - 0.5);
+            return { type: 'question', q: item.q, options: sOpts, correct: sOpts.indexOf(item.ans) };
+        });
+
+        // 4 Events
         const eventList = [
-            { type: 'points', val: 30, title: "LUCKY DROP", text: "A bag of gold fell on your head! +30 Points." },
             { type: 'points', val: 50, title: "JACKPOT", text: "You found the hidden treasure! +50 Points." },
-            { type: 'points', val: -20, title: "STEPPED ON A MINE", text: "BOOM! You lost 20 Points." },
-            { type: 'points', val: -10, title: "PICKPOCKETED", text: "A thief stole 10 Points from you." },
-            { type: 'swap', val: 0, title: "FREAKY FRIDAY", text: "You must swap your score with the highest team!" },
-            { type: 'challenge', val: 0, title: "CHALLENGE: DANCER", text: "Your team must do a Tiktok dance for 15 seconds!" },
-            { type: 'challenge', val: 0, title: "CHALLENGE: SINGER", text: "Sing the chorus of an English song loudly!" },
-            { type: 'challenge', val: 0, title: "CHALLENGE: FITNESS", text: "The team captain must do 10 push-ups or 15 jumping jacks!" }
+            { type: 'give', val: 0, title: "CHARITY", text: "You must give 20 points to a random team!" },
+            { type: 'points', val: -30, title: "STEPPED ON A MINE", text: "BOOM! You lost 30 Points." },
+            { type: 'swap', mode: 'high', title: "FREAKY FRIDAY", text: "You must swap your score with the HIGHEST team!" }
         ];
 
-        let masterBoxes = [];
-        qList.forEach(q => masterBoxes.push({ type: 'question', ...q }));
-        eventList.forEach(e => masterBoxes.push(e));
-
+        let masterBoxes = [...qList, ...eventList];
         let activeBoxes = [...masterBoxes].sort(() => Math.random() - 0.5);
         activeBoxes.forEach(b => b.opened = false);
 
         let teams = [];
         let openedBoxesCount = 0; 
-        let mainTurnIdx = 0; 
         let currentAnsweringIdx = 0; 
         let attemptedThisTurn = []; 
         let currentActiveBox = null;
         let pendingBoxIdx = null;
         let timer, timeLeft = 20;
 
+        // CÁC PHA LẬT KÈO MẠNH CHO COMBO 3
         const comboGifts = [
             { t: "JACKPOT! +40 POINTS", f: () => teams[currentAnsweringIdx].score += 40, color: "#00ff66" },
             { t: "DOUBLE POINTS (X2)", f: () => teams[currentAnsweringIdx].score *= 2, color: "#00f0ff" },
             { t: "VAMPIRE! STEAL 10 FROM ALL", f: () => teams.forEach((t, i) => { if(i !== currentAnsweringIdx) { t.score -= 10; teams[currentAnsweringIdx].score += 10; } }), color: "#ff007b" },
-            { t: "TRAP! LOSE 20 POINTS", f: () => teams[currentAnsweringIdx].score -= 20, color: "#ff3300" }
+            { t: "TRAP! LOSE 20 POINTS", f: () => teams[currentAnsweringIdx].score -= 20, color: "#ff3300" },
+            { t: "ROBIN HOOD! STEAL 30 FROM 1ST PLACE", f: () => {
+                let topIdx = 0;
+                teams.forEach((t, i) => { if(t.score > teams[topIdx].score) topIdx = i; });
+                if(topIdx !== currentAnsweringIdx) { teams[topIdx].score -= 30; teams[currentAnsweringIdx].score += 30; } 
+                else { teams[currentAnsweringIdx].score += 30; }
+            }, color: "#ffdf00"},
+            { t: "FREAKY! SWAP WITH 1ST PLACE", f: () => {
+                let topIdx = 0;
+                teams.forEach((t, i) => { if(t.score > teams[topIdx].score) topIdx = i; });
+                if(topIdx !== currentAnsweringIdx) {
+                    let temp = teams[currentAnsweringIdx].score;
+                    teams[currentAnsweringIdx].score = teams[topIdx].score;
+                    teams[topIdx].score = temp;
+                }
+            }, color: "#00f0ff"},
+            { t: "EQUALIZER! SET ALL TO YOUR SCORE", f: () => {
+                let myScore = teams[currentAnsweringIdx].score;
+                teams.forEach(t => t.score = myScore);
+            }, color: "#ff007b"}
         ];
         let availableComboGifts = [...comboGifts];
+
+        function getWrongPenalty() {
+            let r = Math.random();
+            if (r < 0.1) return 30; 
+            if (r < 0.4) return 20; 
+            return 10;              
+        }
 
         function startGame() {
             for(let i=0; i<4; i++) {
@@ -333,7 +385,6 @@
             showGridScreen();
         }
 
-        // UPDATE LIVE SCOREBOARD
         function updateScoreboard() {
             const sb = document.getElementById('scoreboard-bar');
             sb.innerHTML = '';
@@ -343,6 +394,7 @@
                     <div class="score-card ${isActive ? 'active' : ''}">
                         <div class="score-team-name">${t.name}</div>
                         <div class="score-points">${t.score}</div>
+                        <div class="score-streak">Streak: ${t.streak} 🔥</div>
                     </div>
                 `;
             });
@@ -362,8 +414,9 @@
             document.getElementById('timer-display').style.visibility = 'hidden';
             document.getElementById('steal-badge').style.display = 'none';
             document.getElementById('btn-next-turn').style.display = 'none';
+            document.getElementById('penalty-text').style.display = 'none';
             
-            updateScoreboard(); // Reset active highlight
+            updateScoreboard();
 
             const gridArea = document.getElementById('grid-area');
             gridArea.innerHTML = '';
@@ -376,7 +429,6 @@
             });
         }
 
-        // SELECT TEAM MANUALLY
         function showTeamSelectModal(idx) {
             pendingBoxIdx = idx;
             const modal = document.getElementById('team-select-modal');
@@ -399,14 +451,13 @@
 
         function startBoxForTeam(teamIdx) {
             document.getElementById('team-select-modal').style.display = 'none';
-            mainTurnIdx = teamIdx;
             currentAnsweringIdx = teamIdx;
             
             playSound('sfx-tada');
             activeBoxes[pendingBoxIdx].opened = true;
             currentActiveBox = activeBoxes[pendingBoxIdx];
             document.getElementById('grid-area').style.display = 'none';
-            updateScoreboard(); // Highlights the answering team
+            updateScoreboard();
 
             if (currentActiveBox.type === 'question') {
                 loadQuestionUI(currentActiveBox);
@@ -418,28 +469,54 @@
         function loadEventUI(box) {
             document.getElementById('event-area').style.display = 'block';
             document.getElementById('event-title').innerText = box.title;
-            document.getElementById('event-title').style.color = (box.val > 0 || box.type === 'challenge') ? '#ffdf00' : '#ff3300';
+            document.getElementById('event-title').style.color = (box.val > 0 || box.type === 'challenge' || box.type==='lifeline') ? '#ffdf00' : '#ff3300';
             document.getElementById('event-text').innerText = box.text;
         }
 
         function acceptEvent() {
-            if(currentActiveBox.type === 'points') {
-                teams[currentAnsweringIdx].score += currentActiveBox.val;
-                if(currentActiveBox.val > 0) playSound('sfx-correct'); else playSound('sfx-wrong');
-            } else if (currentActiveBox.type === 'swap') {
-                let maxIdx = 0;
-                teams.forEach((t, i) => { if(t.score > teams[maxIdx].score) maxIdx = i; });
-                if(maxIdx !== currentAnsweringIdx) {
+            let box = currentActiveBox;
+            let needCustomAlert = false;
+            let alertMsg = "";
+            let btnMsg = "GOT IT";
+
+            if(box.type === 'points') {
+                teams[currentAnsweringIdx].score += box.val;
+                if(box.val > 0) playSound('sfx-correct'); else playSound('sfx-wrong');
+            } else if (box.type === 'give') {
+                let others = [0,1,2,3].filter(i => i !== currentAnsweringIdx);
+                let lucky = others[Math.floor(Math.random() * others.length)];
+                teams[currentAnsweringIdx].score -= 20;
+                teams[lucky].score += 20;
+                playSound('sfx-tada');
+                needCustomAlert = true;
+                alertMsg = `You just gave 20 points to ${teams[lucky].name}! 💸`;
+                btnMsg = "HOW GENEROUS!";
+            } else if (box.type === 'swap') {
+                let targetIdx = 0;
+                if (box.mode === 'high') {
+                    teams.forEach((t, i) => { if(t.score > teams[targetIdx].score) targetIdx = i; });
+                } else {
+                    teams.forEach((t, i) => { if(t.score < teams[targetIdx].score) targetIdx = i; });
+                }
+                if(targetIdx !== currentAnsweringIdx) {
                     let temp = teams[currentAnsweringIdx].score;
-                    teams[currentAnsweringIdx].score = teams[maxIdx].score;
-                    teams[maxIdx].score = temp;
+                    teams[currentAnsweringIdx].score = teams[targetIdx].score;
+                    teams[targetIdx].score = temp;
                 }
                 playSound('sfx-tada');
             } else {
                 playSound('sfx-correct');
             }
+
             updateScoreboard();
-            setTimeout(processTurnEnd, 1000);
+
+            if (needCustomAlert) {
+                showCustomAlert(alertMsg, btnMsg, () => {
+                    processTurnEnd();
+                });
+            } else {
+                setTimeout(processTurnEnd, 1000);
+            }
         }
 
         function loadQuestionUI(qData) {
@@ -472,9 +549,8 @@
 
         function updateLifelinesUI() {
             const container = document.getElementById('lifelines-container');
-            if (currentAnsweringIdx !== mainTurnIdx) return container.style.visibility = 'hidden';
             container.style.visibility = 'visible';
-            const t = teams[mainTurnIdx];
+            const t = teams[currentAnsweringIdx]; 
             ['5050', 'call', 'audience'].forEach(l => {
                 const btn = document.getElementById(`ll-${l}`);
                 const isUsed = l === '5050' ? t.l5050 : (l === 'call' ? t.lCall : t.lAudience);
@@ -491,6 +567,7 @@
             timerEl.innerText = `⏳ ${timeLeft}`;
             timerEl.classList.remove('warning');
             document.body.classList.remove('time-warning');
+            document.getElementById('penalty-text').style.display = 'none';
 
             timer = setInterval(() => {
                 timeLeft--;
@@ -539,20 +616,29 @@
 
         function handleWrongAnswer(selectedIdx) {
             if (selectedIdx !== null) document.getElementById('opt-' + selectedIdx).classList.add('wrong');
+            
+            let penalty = getWrongPenalty();
+            teams[currentAnsweringIdx].score -= penalty;
             teams[currentAnsweringIdx].streak = 0;
             attemptedThisTurn.push(currentAnsweringIdx);
+            
+            const pt = document.getElementById('penalty-text');
+            pt.innerText = `WRONG! -${penalty} POINTS!`;
+            pt.style.display = 'block';
+
             updateScoreboard();
             updateComboBadge();
             
             document.querySelectorAll('.option-btn').forEach((b) => {
                 if (!b.classList.contains('wrong') && !b.classList.contains('disabled-5050')) b.disabled = false;
             });
+
             if (attemptedThisTurn.length >= 4) {
                 const correctBtn = document.getElementById('opt-' + currentActiveBox.correct);
                 if(correctBtn) correctBtn.classList.add('correct');
-                setTimeout(processTurnEnd, 2000);
+                setTimeout(processTurnEnd, 2500);
             } else {
-                setTimeout(showStealModal, 1000);
+                setTimeout(showStealModal, 1500);
             }
         }
 
@@ -577,8 +663,10 @@
             currentAnsweringIdx = teamIdx;
             
             document.getElementById('steal-badge').style.display = 'inline-block';
+            document.getElementById('penalty-text').style.display = 'none';
             updateScoreboard();
             updateComboBadge();
+            updateLifelinesUI();
             
             document.getElementById('btn-next-turn').style.display = 'inline-block';
             startTimer(); 
@@ -599,7 +687,7 @@
         }
 
         function use5050() {
-            teams[mainTurnIdx].l5050 = true; updateLifelinesUI();
+            teams[currentAnsweringIdx].l5050 = true; updateLifelinesUI();
             let wrongIndices = [];
             const correctIdx = currentActiveBox.correct;
             for(let i=0; i<4; i++) { if(i !== correctIdx) wrongIndices.push(i); }
@@ -609,14 +697,25 @@
                 btn.classList.add('disabled-5050'); btn.disabled = true;
             });
         }
+
         function useCall() {
-            teams[mainTurnIdx].lCall = true; updateLifelinesUI();
+            teams[currentAnsweringIdx].lCall = true; updateLifelinesUI();
             const ans = ['A', 'B', 'C', 'D'][currentActiveBox.correct];
-            document.getElementById('call-content').innerHTML = `📞 Friend: "I'm 100% sure the answer is <b>${ans}</b>!"`;
+            
+            const mrDamQuotes = [
+                `"Trời ơi! Câu này anh nhắm mắt cũng chọn được đáp án ${ans} nha cưng!"`,
+                `"Vùng đất cấm thì anh rành, chứ câu này anh chắc kèo 100% đáp án là ${ans} nhé!"`,
+                `"Anh mới chạy show bay về mệt lắm, nhưng nể tình gọi nhờ thì đáp án chuẩn là ${ans} nha!"`,
+                `"Không chọn đáp án ${ans} là anh xé vé ca nhạc ráng chịu nha!"`
+            ];
+            const quote = mrDamQuotes[Math.floor(Math.random() * mrDamQuotes.length)];
+            
+            document.getElementById('call-content').innerHTML = `🎤 Mr. Dam: ${quote}`;
             document.getElementById('call-modal').style.display = 'flex';
         }
+
         function useAudience() {
-            teams[mainTurnIdx].lAudience = true; updateLifelinesUI();
+            teams[currentAnsweringIdx].lAudience = true; updateLifelinesUI();
             const correctIdx = currentActiveBox.correct;
             const letters = ['A', 'B', 'C', 'D'];
             let html = `Audience Votes:<br><br>`;
@@ -669,16 +768,16 @@
                 
                 if(i === 0) {
                     posText = "1ST"; tierClass = "tier-1";
-                    actionHTML = `🏆 CHAMPION! Claim your physical prize from the teacher!`;
+                    actionHTML = `🏆 CHAMPION! Claim your physical prize!`;
                 } else if(i === 1) {
                     posText = "2ND"; tierClass = "tier-2";
-                    actionHTML = `🎁 <button class="secret-btn" onclick="revealVideo('reward')">WATCH REWARD VIDEO</button>`;
+                    actionHTML = `🎁 <button class="secret-btn" onclick="revealVideo('reward')">REVEAL REWARD VIDEO</button>`;
                 } else if(i === 2) {
                     posText = "3RD"; tierClass = "tier-3";
-                    actionHTML = `💀 <button class="secret-btn" onclick="revealVideo('punish')">WATCH PUNISHMENT VIDEO</button>`;
+                    actionHTML = `💀 <button class="secret-btn" onclick="revealVideo('punish')">REVEAL PUNISHMENT VIDEO</button>`;
                 } else {
                     posText = "4TH"; tierClass = "tier-4";
-                    actionHTML = `🧹 ULTIMATE PUNISHMENT: You must clean the whiteboard and sing Baby Shark!`;
+                    actionHTML = `🧹 ULTIMATE PUNISHMENT: Perform the given challenge right now!`;
                 }
 
                 html += `
