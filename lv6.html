@@ -71,11 +71,12 @@
         /* LIVE SCOREBOARD */
         .scoreboard-bar {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
-            margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px dashed rgba(255,255,255,0.2);
+            margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed rgba(255,255,255,0.2);
         }
         .score-card {
             background: rgba(0, 0, 0, 0.6); border: 2px solid var(--accent2);
             border-radius: 15px; padding: 10px; text-align: center; transition: 0.3s;
+            position: relative;
         }
         .score-card.active {
             border-color: var(--success); box-shadow: 0 0 20px rgba(0,255,102,0.4);
@@ -85,7 +86,23 @@
         .score-points { font-size: 2.5rem; font-weight: 900; color: white; text-shadow: 2px 2px 4px black; }
         .score-streak { font-size: 1rem; color: #ff007b; font-weight: bold; margin-top: 5px; }
 
-        .steal-badge { display: inline-block; background: #ffdf00; color: black; font-size: 1rem; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; animation: pulse 0.5s infinite; }
+        /* FLOATING POINTS ANIMATION */
+        .floating-points {
+            position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+            font-size: 3.5rem; font-weight: 900; pointer-events: none;
+            animation: floatUpFade 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; z-index: 100;
+            text-shadow: 0 0 15px rgba(0,0,0,0.9), 2px 2px 0px #000;
+        }
+        .floating-points.positive { color: var(--success); }
+        .floating-points.negative { color: var(--warning); }
+
+        @keyframes floatUpFade {
+            0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -30px) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -100px) scale(1); }
+        }
+
+        .steal-badge { display: inline-block; background: #ffdf00; color: black; font-size: 1rem; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; animation: pulse 0.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         /* Lifelines & Timer */
@@ -110,7 +127,7 @@
 
         /* Question Area */
         .question-area { display: none; background: linear-gradient(135deg, rgba(255,0,123,0.3), rgba(0,240,255,0.3)); padding: 40px; border-radius: 20px; text-align: center; border: 2px solid rgba(255,255,255,0.4); position: relative; }
-        .question-text { font-size: 1.8rem; margin-bottom: 40px; font-weight: bold; text-shadow: 1px 1px 3px black; line-height: 1.4; }
+        .question-text { font-size: 1.8rem; margin-bottom: 40px; font-weight: bold; text-shadow: 1px 1px 3px black; line-height: 1.4; white-space: pre-line; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .option-btn {
             background: rgba(0,0,0,0.6); border: 2px solid var(--accent2); color: white; padding: 20px; font-size: 1.3rem; 
@@ -131,7 +148,7 @@
         
         /* Modals */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px); }
-        .modal-content { background: linear-gradient(135deg, #1f0033, #001a33); border: 3px solid var(--accent2); border-radius: 25px; padding: 50px; text-align: center; width: 80%; max-width: 600px; box-shadow: 0 0 50px rgba(0,240,255,0.3); }
+        .modal-content { background: linear-gradient(135deg, #1f0033, #001a33); border: 3px solid var(--accent2); border-radius: 25px; padding: 40px; text-align: center; width: 80%; max-width: 650px; box-shadow: 0 0 50px rgba(0,240,255,0.3); }
         .team-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
         .team-btn { background: #ff007b; border: 2px solid white; color: white; padding: 15px; font-size: 1.5rem; border-radius: 15px; font-weight: bold; }
 
@@ -160,12 +177,36 @@
         .tier-3 .rank-pos { color: #cd7f32; }
         .tier-4 { border-color: #ff3300; }
         .tier-4 .rank-pos { color: #ff3300; }
+
+        /* EARLY END BUTTON */
+        .btn-end-game {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--warning);
+            color: var(--warning);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 100;
+        }
+        .btn-end-game:hover {
+            background: var(--warning);
+            color: white;
+            box-shadow: 0 0 15px var(--warning);
+        }
     </style>
 </head>
 <body>
-    <audio id="sfx-correct" src="https://www.myinstants.com/media/sounds/correct.mp3"></audio>
-    <audio id="sfx-wrong" src="https://www.myinstants.com/media/sounds/wrong-buzzer.mp3"></audio>
-    <audio id="sfx-tada" src="https://www.myinstants.com/media/sounds/tada.mp3"></audio>
+    <audio id="sfx-correct" src="https://www.myinstants.com/media/sounds/correct.mp3" preload="auto"></audio>
+    <audio id="sfx-wrong" src="https://www.myinstants.com/media/sounds/wrong-buzzer.mp3" preload="auto"></audio>
+    <audio id="sfx-tada" src="https://www.myinstants.com/media/sounds/tada.mp3" preload="auto"></audio>
+    <audio id="sfx-pop" src="https://www.myinstants.com/media/sounds/pop_drip.mp3" preload="auto"></audio>
+    <audio id="sfx-fail" src="https://www.myinstants.com/media/sounds/fail-trombone-01.mp3" preload="auto"></audio>
 
     <div class="container" id="setup-screen">
         <h1 class="title">WORD BOOM: MYSTERY BOARD</h1>
@@ -181,7 +222,7 @@
     <div class="container" id="game-screen" style="display: none;">
         <div class="scoreboard-bar" id="scoreboard-bar"></div>
 
-        <div style="text-align: center; height: 35px;">
+        <div style="text-align: center; height: 30px;">
             <div class="steal-badge" id="steal-badge">⚡ STEALING TURN ⚡</div>
         </div>
 
@@ -201,6 +242,10 @@
             <div class="question-text" id="q-text">Loading...</div>
             <div class="options-grid" id="options-area"></div>
             <div class="penalty-text" id="penalty-text"></div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn-main" id="btn-skip-q" style="background: #ff3300; padding: 10px 30px; font-size: 1.2rem;" onclick="skipQuestion()">⏭️ SKIP QUESTION</button>
+            </div>
         </div>
         
         <div class="event-area" id="event-area">
@@ -209,9 +254,7 @@
             <button class="btn-main" onclick="acceptEvent()">DONE</button>
         </div>
 
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="btn-main" id="btn-next-turn" style="display:none; background: #555; padding: 10px 20px; font-size: 1rem;" onclick="processTurnEnd()">SKIP / CONTINUE</button>
-        </div>
+        <button class="btn-end-game" onclick="forceEndGame()">🛑 END GAME EARLY</button>
     </div>
 
     <div class="container end-screen" id="end-screen">
@@ -221,19 +264,10 @@
     </div>
 
     <div id="custom-alert-modal" class="modal">
-        <div class="modal-content" style="max-width: 450px; border-color: #ffdf00; padding: 40px;">
+        <div class="modal-content" style="border-color: #ffdf00;">
             <h2 style="color: #ffdf00; margin-top: 0;">🔔 NOTICE</h2>
-            <div id="custom-alert-text" style="font-size: 1.5rem; margin-bottom: 30px; font-weight: bold; line-height: 1.4;"></div>
+            <div id="custom-alert-text" style="font-size: 1.3rem; margin-bottom: 30px; font-weight: bold; line-height: 1.5; white-space: pre-line;"></div>
             <button class="btn-main" id="custom-alert-btn">AWESOME!</button>
-        </div>
-    </div>
-
-    <div id="team-select-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent2); font-size: 2.5rem; margin-top: 0;">🎯 SELECT A TEAM</h2>
-            <p style="font-size: 1.2rem; color: #ccc;">Who will open this box?</p>
-            <div class="team-select-grid" id="initial-team-options"></div>
-            <button class="btn-main" style="background: #555; margin-top: 20px;" onclick="cancelBoxOpen()">CANCEL</button>
         </div>
     </div>
 
@@ -269,7 +303,14 @@
     </div>
 
     <script>
-        const playSound = (id) => { document.getElementById(id).currentTime = 0; document.getElementById(id).play().catch(()=>{}); }
+        const playSound = (id) => { 
+            const audioEl = document.getElementById(id);
+            if(audioEl) {
+                const clone = audioEl.cloneNode();
+                clone.volume = 1;
+                clone.play().catch(()=>{});
+            }
+        }
         const fireConfetti = () => { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999 }); }
 
         function showCustomAlert(msg, btnText, callback) {
@@ -283,7 +324,22 @@
             };
         }
 
-        // 24 Questions
+        // FLOATING SCORE LOGIC
+        function showFloatingScore(teamIdx, amount) {
+            if (amount === 0) return;
+            const scoreCards = document.querySelectorAll('.score-card');
+            if (!scoreCards[teamIdx]) return;
+            
+            const card = scoreCards[teamIdx];
+            const floatEl = document.createElement('div');
+            floatEl.className = `floating-points ${amount > 0 ? 'positive' : 'negative'}`;
+            floatEl.innerText = amount > 0 ? `+${amount}` : amount;
+            
+            card.appendChild(floatEl);
+            setTimeout(() => floatEl.remove(), 1500);
+        }
+
+        // EXACTLY 23 NORMAL QUESTIONS AS REQUESTED
         const rawQList = [
             { q: "At the airport, the officer decided to ______ my liquids because they were over the limit.", opts: ["reimburse", "confiscate", "encrypt", "receive"], ans: "confiscate" },
             { q: "You should keep your ______ as proof if you want a refund.", opts: ["tickets", "luggage", "receipts", "passports"], ans: "receipts" },
@@ -306,16 +362,23 @@
             { q: "If he had checked his luggage, he ______ it.", opts: ["won’t lose", "wouldn’t lose", "wouldn’t have lost", "didn’t lose"], ans: "wouldn’t have lost" },
             { q: "If we ______ earlier, we would catch the flight now.", opts: ["leave", "left", "had left", "leaving"], ans: "had left" },
             { q: "If I had a map, I ______ get lost.", opts: ["won’t", "wouldn’t", "didn’t", "don’t"], ans: "wouldn’t" },
-            { q: "If only I ______ my ticket carefully, I wouldn’t have gone to the wrong gate.", opts: ["check", "checked", "had checked", "checking"], ans: "had checked" },
-            { q: "If she ______ more money, she would travel more comfortably.", opts: ["has", "had", "have", "having"], ans: "had" },
-            { q: "If only the staff ______ more helpful, the situation wouldn’t be so stressful.", opts: ["are", "were", "was", "be"], ans: "were" }
+            { q: "I didn’t check my ticket carefully, so I went to the wrong gate.\n👉 Which sentence is closest in meaning?", opts: ["If I checked my ticket carefully, I wouldn’t go to the wrong gate.", "If I check my ticket carefully, I won’t go to the wrong gate.", "If I had checked my ticket carefully, I wouldn’t have gone to the wrong gate.", "If only I checked my ticket carefully, I wouldn’t go to the wrong gate."], ans: "If I had checked my ticket carefully, I wouldn’t have gone to the wrong gate." },
+            { q: "She doesn’t have much money, so she can’t travel comfortably.\n👉 Which sentence is closest in meaning?", opts: ["If she has more money, she will travel comfortably.", "If she had more money, she would travel more comfortably.", "If she had had more money, she would travel comfortably.", "If she having more money, she would travel comfortably."], ans: "If she had more money, she would travel more comfortably." }
         ];
 
-        let shuffledQs = [...rawQList].sort(() => Math.random() - 0.5);
-        let qList = shuffledQs.map(item => {
-            let sOpts = [...item.opts].sort(() => Math.random() - 0.5);
-            return { type: 'question', q: item.q, options: sOpts, correct: sOpts.indexOf(item.ans) };
-        });
+        // 1 Special Question (All Wrong)
+        const specialBoxData = {
+            type: 'special',
+            q: "Find the correct sentence.",
+            options: [
+                "A. If I would check my luggage, I wouldn’t have lost it.",
+                "B. If I had checked my luggage, I wouldn’t lose it.",
+                "C. If I checked my luggage, I wouldn’t have lost it.",
+                "D. If only I checked my ticket, I wouldn’t have gone to the wrong gate."
+            ],
+            correct: -1, 
+            explanation: "ALL OPTIONS ARE INCORRECT!\n\n❌ A: Do not use 'would' in the If-clause.\n❌ B: Tense mismatch (past condition -> present result doesn't fit here).\n❌ C: Tense mismatch (present unreal condition -> past result).\n❌ D: 'If only' for a past regret requires Past Perfect (had + V3).\n\nCORRECT VERSIONS:\nA -> If I had checked my luggage, I wouldn't have lost it.\nB -> If I checked my luggage, I wouldn't lose it.\nC -> If I had checked my luggage, I wouldn't be in trouble now.\nD -> If only I had checked my ticket, I wouldn't have gone to the wrong gate."
+        };
 
         // 4 Events
         const eventList = [
@@ -325,29 +388,44 @@
             { type: 'swap', mode: 'high', title: "FREAKY FRIDAY", text: "You must swap your score with the HIGHEST team!" }
         ];
 
-        let masterBoxes = [...qList, ...eventList];
+        let qList = rawQList.map(item => {
+            let sOpts = [...item.opts].sort(() => Math.random() - 0.5);
+            return { type: 'question', q: item.q, options: sOpts, correct: sOpts.indexOf(item.ans) };
+        });
+
+        let masterBoxes = [...qList, ...eventList]; // 27 boxes
         let activeBoxes = [...masterBoxes].sort(() => Math.random() - 0.5);
+        
+        // TRAP BOX ALWAYS AT INDEX 14 (Box 15)
+        activeBoxes.splice(14, 0, specialBoxData);
         activeBoxes.forEach(b => b.opened = false);
 
         let teams = [];
-        let openedBoxesCount = 0; 
+        let turnCounter = 0; 
         let currentAnsweringIdx = 0; 
         let attemptedThisTurn = []; 
         let currentActiveBox = null;
-        let pendingBoxIdx = null;
+        let specialBoxExplained = false;
         let timer, timeLeft = 20;
 
-        // CÁC PHA LẬT KÈO MẠNH CHO COMBO 3
         const comboGifts = [
-            { t: "JACKPOT! +40 POINTS", f: () => teams[currentAnsweringIdx].score += 40, color: "#00ff66" },
-            { t: "DOUBLE POINTS (X2)", f: () => teams[currentAnsweringIdx].score *= 2, color: "#00f0ff" },
-            { t: "VAMPIRE! STEAL 10 FROM ALL", f: () => teams.forEach((t, i) => { if(i !== currentAnsweringIdx) { t.score -= 10; teams[currentAnsweringIdx].score += 10; } }), color: "#ff007b" },
-            { t: "TRAP! LOSE 20 POINTS", f: () => teams[currentAnsweringIdx].score -= 20, color: "#ff3300" },
-            { t: "ROBIN HOOD! STEAL 30 FROM 1ST PLACE", f: () => {
+            { t: "JACKPOT! +40 POINTS", f: () => { teams[currentAnsweringIdx].score += 40; setTimeout(()=>showFloatingScore(currentAnsweringIdx, 40), 10); }, color: "#00ff66" },
+            { t: "DOUBLE POINTS (X2)", f: () => { let diff = teams[currentAnsweringIdx].score; teams[currentAnsweringIdx].score *= 2; setTimeout(()=>showFloatingScore(currentAnsweringIdx, diff), 10); }, color: "#00f0ff" },
+            { t: "VAMPIRE! STEAL 10 FROM ALL", f: () => {
+                let stolen = 0;
+                teams.forEach((t, i) => { if(i !== currentAnsweringIdx) { t.score -= 10; stolen += 10; setTimeout(()=>showFloatingScore(i, -10), 10); } });
+                teams[currentAnsweringIdx].score += stolen;
+                setTimeout(()=>showFloatingScore(currentAnsweringIdx, stolen), 10);
+            }, color: "#ff007b" },
+            { t: "TRAP! LOSE 20 POINTS", f: () => { teams[currentAnsweringIdx].score -= 20; setTimeout(()=>showFloatingScore(currentAnsweringIdx, -20), 10); }, color: "#ff3300" },
+            { t: "ROBIN HOOD! STEAL 30 FROM 1ST", f: () => {
                 let topIdx = 0;
                 teams.forEach((t, i) => { if(t.score > teams[topIdx].score) topIdx = i; });
-                if(topIdx !== currentAnsweringIdx) { teams[topIdx].score -= 30; teams[currentAnsweringIdx].score += 30; } 
-                else { teams[currentAnsweringIdx].score += 30; }
+                if(topIdx !== currentAnsweringIdx) { 
+                    teams[topIdx].score -= 30; 
+                    teams[currentAnsweringIdx].score += 30; 
+                    setTimeout(()=>{ showFloatingScore(topIdx, -30); showFloatingScore(currentAnsweringIdx, 30); }, 10);
+                } 
             }, color: "#ffdf00"},
             { t: "FREAKY! SWAP WITH 1ST PLACE", f: () => {
                 let topIdx = 0;
@@ -360,7 +438,13 @@
             }, color: "#00f0ff"},
             { t: "EQUALIZER! SET ALL TO YOUR SCORE", f: () => {
                 let myScore = teams[currentAnsweringIdx].score;
-                teams.forEach(t => t.score = myScore);
+                teams.forEach((t, i) => { 
+                    if(i !== currentAnsweringIdx) {
+                        let diff = myScore - t.score;
+                        t.score = myScore;
+                        if(diff !== 0) setTimeout(()=>showFloatingScore(i, diff), 10);
+                    }
+                });
             }, color: "#ff007b"}
         ];
         let availableComboGifts = [...comboGifts];
@@ -389,7 +473,7 @@
             const sb = document.getElementById('scoreboard-bar');
             sb.innerHTML = '';
             teams.forEach((t, i) => {
-                const isActive = (document.getElementById('question-area').style.display === 'block' || document.getElementById('event-area').style.display === 'block') && i === currentAnsweringIdx;
+                const isActive = i === currentAnsweringIdx; 
                 sb.innerHTML += `
                     <div class="score-card ${isActive ? 'active' : ''}">
                         <div class="score-team-name">${t.name}</div>
@@ -401,10 +485,13 @@
         }
 
         function showGridScreen() {
-            if (openedBoxesCount >= 28) return endGame();
+            if (turnCounter >= 28) return endGame();
 
+            let mainTurnIdx = turnCounter % 4; // TỰ ĐỘNG CHUYỂN LƯỢT THEO VÒNG TRÒN
+            currentAnsweringIdx = mainTurnIdx;
             attemptedThisTurn = [];
             currentActiveBox = null;
+            specialBoxExplained = false;
             document.body.classList.remove('time-warning');
 
             document.getElementById('grid-area').style.display = 'grid';
@@ -413,7 +500,7 @@
             document.getElementById('lifelines-container').style.visibility = 'hidden';
             document.getElementById('timer-display').style.visibility = 'hidden';
             document.getElementById('steal-badge').style.display = 'none';
-            document.getElementById('btn-next-turn').style.display = 'none';
+            document.getElementById('btn-skip-q').style.display = 'none';
             document.getElementById('penalty-text').style.display = 'none';
             
             updateScoreboard();
@@ -424,44 +511,26 @@
                 const btn = document.createElement('div');
                 btn.className = `grid-box ${box.opened ? 'opened' : ''}`;
                 btn.innerText = idx + 1;
-                if(!box.opened) btn.onclick = () => showTeamSelectModal(idx);
+                if(!box.opened) btn.onclick = () => openBox(idx);
                 gridArea.appendChild(btn);
             });
         }
 
-        function showTeamSelectModal(idx) {
-            pendingBoxIdx = idx;
-            const modal = document.getElementById('team-select-modal');
-            const grid = document.getElementById('initial-team-options');
-            grid.innerHTML = '';
-            teams.forEach((t, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'team-btn';
-                btn.innerText = t.name;
-                btn.onclick = () => startBoxForTeam(i);
-                grid.appendChild(btn);
-            });
-            modal.style.display = 'flex';
-        }
-
-        function cancelBoxOpen() {
-            document.getElementById('team-select-modal').style.display = 'none';
-            pendingBoxIdx = null;
-        }
-
-        function startBoxForTeam(teamIdx) {
-            document.getElementById('team-select-modal').style.display = 'none';
-            currentAnsweringIdx = teamIdx;
-            
-            playSound('sfx-tada');
-            activeBoxes[pendingBoxIdx].opened = true;
-            currentActiveBox = activeBoxes[pendingBoxIdx];
+        function openBox(idx) {
+            activeBoxes[idx].opened = true;
+            currentActiveBox = activeBoxes[idx];
             document.getElementById('grid-area').style.display = 'none';
             updateScoreboard();
 
-            if (currentActiveBox.type === 'question') {
+            if (currentActiveBox.type === 'question' || currentActiveBox.type === 'special') {
+                playSound('sfx-pop');
                 loadQuestionUI(currentActiveBox);
             } else {
+                let isGood = true;
+                if(currentActiveBox.type === 'give' || (currentActiveBox.type === 'points' && currentActiveBox.val < 0)) isGood = false;
+                
+                if(isGood) playSound('sfx-tada'); else playSound('sfx-fail');
+                
                 loadEventUI(currentActiveBox);
             }
         }
@@ -481,12 +550,18 @@
 
             if(box.type === 'points') {
                 teams[currentAnsweringIdx].score += box.val;
-                if(box.val > 0) playSound('sfx-correct'); else playSound('sfx-wrong');
+                updateScoreboard();
+                showFloatingScore(currentAnsweringIdx, box.val);
             } else if (box.type === 'give') {
                 let others = [0,1,2,3].filter(i => i !== currentAnsweringIdx);
                 let lucky = others[Math.floor(Math.random() * others.length)];
                 teams[currentAnsweringIdx].score -= 20;
                 teams[lucky].score += 20;
+                
+                updateScoreboard();
+                showFloatingScore(currentAnsweringIdx, -20);
+                showFloatingScore(lucky, 20);
+                
                 playSound('sfx-tada');
                 needCustomAlert = true;
                 alertMsg = `You just gave 20 points to ${teams[lucky].name}! 💸`;
@@ -503,35 +578,36 @@
                     teams[currentAnsweringIdx].score = teams[targetIdx].score;
                     teams[targetIdx].score = temp;
                 }
+                updateScoreboard();
                 playSound('sfx-tada');
             } else {
-                playSound('sfx-correct');
+                updateScoreboard();
             }
-
-            updateScoreboard();
 
             if (needCustomAlert) {
                 showCustomAlert(alertMsg, btnMsg, () => {
-                    processTurnEnd();
+                    finalizeTurnEnd();
                 });
             } else {
-                setTimeout(processTurnEnd, 1000);
+                setTimeout(finalizeTurnEnd, 1500);
             }
         }
 
         function loadQuestionUI(qData) {
             document.getElementById('question-area').style.display = 'block';
+            document.getElementById('btn-skip-q').style.display = 'inline-block';
             updateLifelinesUI();
             
             document.getElementById('q-text').innerText = qData.q;
             const optionsArea = document.getElementById('options-area');
             optionsArea.innerHTML = '';
-            const letters = ['A', 'B', 'C', 'D'];
-            qData.options.forEach((opt, idx) => {
+            
+            let opts = qData.options;
+            opts.forEach((opt, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.id = 'opt-' + idx;
-                btn.innerHTML = `<span style="color:var(--accent2); font-weight:900;">${letters[idx]}.</span> ${opt}`;
+                btn.innerHTML = `<span>${opt}</span>`;
                 btn.onclick = () => checkAnswer(idx);
                 optionsArea.appendChild(btn);
             });
@@ -542,7 +618,7 @@
         function updateComboBadge() {
             const badge = document.getElementById('combo-badge');
             let streak = teams[currentAnsweringIdx].streak;
-            if (streak >= 2 && currentActiveBox && currentActiveBox.type === 'question') {
+            if (streak >= 2 && currentActiveBox && (currentActiveBox.type === 'question' || currentActiveBox.type === 'special')) {
                 badge.style.display = 'block'; badge.innerText = `COMBO X${streak} 🔥`;
             } else badge.style.display = 'none';
         }
@@ -586,6 +662,45 @@
             }, 1000);
         }
 
+        function skipQuestion() {
+            clearInterval(timer);
+            document.getElementById('timer-display').classList.remove('warning');
+            document.body.classList.remove('time-warning');
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+            if (currentActiveBox.type === 'special') {
+                teams[currentAnsweringIdx].score += 100;
+                playSound('sfx-tada');
+                fireConfetti();
+                
+                updateScoreboard();
+                showFloatingScore(currentAnsweringIdx, 100);
+                
+                specialBoxExplained = true;
+                
+                setTimeout(() => {
+                    showCustomAlert("AMAZING EYE! You spotted the trap!\nAll 4 options are wrong.\n+100 POINTS!\n\n" + currentActiveBox.explanation, "AWESOME", () => {
+                        finalizeTurnEnd();
+                    });
+                }, 500);
+            } else {
+                playSound('sfx-wrong');
+                attemptedThisTurn.push(currentAnsweringIdx);
+                teams[currentAnsweringIdx].streak = 0;
+                
+                updateScoreboard();
+                updateComboBadge();
+                
+                if (attemptedThisTurn.length >= 3) {
+                    const correctBtn = document.getElementById('opt-' + currentActiveBox.correct);
+                    if(correctBtn) correctBtn.classList.add('correct');
+                    setTimeout(processTurnEnd, 2500);
+                } else {
+                    setTimeout(showStealModal, 500);
+                }
+            }
+        }
+
         function checkAnswer(selectedIdx) {
             clearInterval(timer);
             document.getElementById('timer-display').classList.remove('warning');
@@ -600,7 +715,9 @@
                 document.getElementById('opt-' + selectedIdx).classList.add('correct');
                 teams[currentAnsweringIdx].score += 10;
                 teams[currentAnsweringIdx].streak++;
+                
                 updateScoreboard();
+                showFloatingScore(currentAnsweringIdx, 10);
                 updateComboBadge();
 
                 if (teams[currentAnsweringIdx].streak > 0 && teams[currentAnsweringIdx].streak % 3 === 0) {
@@ -627,15 +744,18 @@
             pt.style.display = 'block';
 
             updateScoreboard();
+            showFloatingScore(currentAnsweringIdx, -penalty);
             updateComboBadge();
             
             document.querySelectorAll('.option-btn').forEach((b) => {
                 if (!b.classList.contains('wrong') && !b.classList.contains('disabled-5050')) b.disabled = false;
             });
 
-            if (attemptedThisTurn.length >= 4) {
-                const correctBtn = document.getElementById('opt-' + currentActiveBox.correct);
-                if(correctBtn) correctBtn.classList.add('correct');
+            if (attemptedThisTurn.length >= 3) {
+                if(currentActiveBox.correct !== -1) {
+                    const correctBtn = document.getElementById('opt-' + currentActiveBox.correct);
+                    if(correctBtn) correctBtn.classList.add('correct');
+                }
                 setTimeout(processTurnEnd, 2500);
             } else {
                 setTimeout(showStealModal, 1500);
@@ -668,21 +788,43 @@
             updateComboBadge();
             updateLifelinesUI();
             
-            document.getElementById('btn-next-turn').style.display = 'inline-block';
+            document.querySelectorAll('.option-btn').forEach(b => {
+                if(!b.classList.contains('wrong') && !b.classList.contains('disabled-5050')) {
+                    b.disabled = false;
+                }
+            });
+
             startTimer(); 
         }
 
         function nobodySteals() {
             document.getElementById('steal-modal').style.display = 'none';
-            const correctBtn = document.getElementById('opt-' + currentActiveBox.correct);
-            if(correctBtn) correctBtn.classList.add('correct');
+            if(currentActiveBox.correct !== -1) {
+                const correctBtn = document.getElementById('opt-' + currentActiveBox.correct);
+                if(correctBtn) correctBtn.classList.add('correct');
+            }
             setTimeout(processTurnEnd, 2000);
         }
 
         function processTurnEnd() {
             clearInterval(timer);
             document.body.classList.remove('time-warning');
-            openedBoxesCount++; 
+
+            if (currentActiveBox && currentActiveBox.type === 'special' && !specialBoxExplained) {
+                specialBoxExplained = true;
+                playSound('sfx-tada'); 
+                setTimeout(() => {
+                    showCustomAlert("TIME'S UP! Didn't you realize this was a trap?\n\n" + currentActiveBox.explanation, "I SEE", () => {
+                        finalizeTurnEnd();
+                    });
+                }, 300);
+            } else {
+                finalizeTurnEnd();
+            }
+        }
+
+        function finalizeTurnEnd() {
+            turnCounter++; 
             showGridScreen();
         }
 
@@ -690,9 +832,16 @@
             teams[currentAnsweringIdx].l5050 = true; updateLifelinesUI();
             let wrongIndices = [];
             const correctIdx = currentActiveBox.correct;
-            for(let i=0; i<4; i++) { if(i !== correctIdx) wrongIndices.push(i); }
-            wrongIndices.sort(() => Math.random() - 0.5);
-            wrongIndices.slice(0, 2).forEach(idx => {
+            
+            if (correctIdx === -1) {
+                wrongIndices = [0,1,2,3].sort(() => Math.random() - 0.5).slice(0,2);
+            } else {
+                for(let i=0; i<4; i++) { if(i !== correctIdx) wrongIndices.push(i); }
+                wrongIndices.sort(() => Math.random() - 0.5);
+                wrongIndices = wrongIndices.slice(0, 2);
+            }
+
+            wrongIndices.forEach(idx => {
                 const btn = document.getElementById('opt-' + idx);
                 btn.classList.add('disabled-5050'); btn.disabled = true;
             });
@@ -700,7 +849,13 @@
 
         function useCall() {
             teams[currentAnsweringIdx].lCall = true; updateLifelinesUI();
-            const ans = ['A', 'B', 'C', 'D'][currentActiveBox.correct];
+            
+            let ans = "";
+            if(currentActiveBox.correct !== -1) {
+                ans = ['A', 'B', 'C', 'D'][currentActiveBox.correct];
+            } else {
+                ans = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)]; 
+            }
             
             const mrDamQuotes = [
                 `"Trời ơi! Câu này anh nhắm mắt cũng chọn được đáp án ${ans} nha cưng!"`,
@@ -719,10 +874,17 @@
             const correctIdx = currentActiveBox.correct;
             const letters = ['A', 'B', 'C', 'D'];
             let html = `Audience Votes:<br><br>`;
+            
             letters.forEach((l, idx) => {
-                let percent = (idx === correctIdx) ? 75 : Math.floor(Math.random() * 10);
+                let percent;
+                if (correctIdx === -1) {
+                    percent = Math.floor(Math.random() * 25 + 10); 
+                } else {
+                    percent = (idx === correctIdx) ? 75 : Math.floor(Math.random() * 10);
+                }
                 html += `Option ${l}: <b style="color:var(--accent2);">${percent}%</b><br>`;
             });
+
             document.getElementById('call-content').innerHTML = html;
             document.getElementById('call-modal').style.display = 'flex';
         }
@@ -752,6 +914,14 @@
         function closeGiftModal() {
             document.getElementById('gift-modal').style.display = 'none';
             processTurnEnd(); 
+        }
+
+        function forceEndGame() {
+            if(confirm("Are you sure you want to end the game early and see the results?")) {
+                clearInterval(timer);
+                document.body.classList.remove('time-warning');
+                endGame();
+            }
         }
 
         // END GAME & TIERS LOGIC
