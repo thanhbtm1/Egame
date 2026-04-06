@@ -158,17 +158,13 @@
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
         /* END GAME */
-        .end-screen { display: none; text-align: center; width: 100%; }
-        .rank-tier { display: flex; align-items: center; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 2px solid var(--accent2); text-align: left; }
-        .rank-pos { font-size: 3rem; font-weight: 900; margin-right: 20px; min-width: 80px; text-align: center; }
+        .end-screen { display: none; text-align: center; width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px; }
+        .rank-tier { display: flex; align-items: center; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px solid var(--accent2); text-align: left; }
+        .rank-pos { font-size: 3rem; font-weight: 900; margin-right: 30px; min-width: 80px; text-align: center; }
         .rank-details { flex-grow: 1; }
-        .rank-name { font-size: 2rem; font-weight: bold; color: #ffdf00; }
-        .rank-score { font-size: 1.5rem; color: #00ff66; margin-bottom: 5px; }
-        .rank-action { font-size: 1.2rem; color: white; font-style: italic; }
+        .rank-name { font-size: 2.2rem; font-weight: bold; color: #ffdf00; text-transform: uppercase; }
+        .rank-score { font-size: 1.8rem; color: #00ff66; font-weight: bold; margin-top: 5px; text-shadow: 1px 1px 2px black;}
         
-        .secret-btn { background: #ff007b; color: white; border: 2px solid white; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; display: inline-block; }
-        .secret-btn:hover { background: white; color: #ff007b; }
-
         .tier-1 { border-color: #ffdf00; box-shadow: 0 0 20px rgba(255,223,0,0.5); }
         .tier-1 .rank-pos { color: #ffdf00; }
         .tier-2 { border-color: #c0c0c0; }
@@ -176,29 +172,15 @@
         .tier-3 { border-color: #cd7f32; }
         .tier-3 .rank-pos { color: #cd7f32; }
         .tier-4 { border-color: #ff3300; }
-        .tier-4 .rank-pos { color: #ff3300; }
+        .tier-4 .rank-pos { color: #ff3300; flex-direction: column; } /* Căn chỉnh lại cho team bét */
 
         /* EARLY END BUTTON */
         .btn-end-game {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--warning);
-            color: var(--warning);
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            z-index: 100;
+            position: absolute; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--warning); color: var(--warning); padding: 10px 20px;
+            border-radius: 15px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; z-index: 100;
         }
-        .btn-end-game:hover {
-            background: var(--warning);
-            color: white;
-            box-shadow: 0 0 15px var(--warning);
-        }
+        .btn-end-game:hover { background: var(--warning); color: white; box-shadow: 0 0 15px var(--warning); }
     </style>
 </head>
 <body>
@@ -324,7 +306,6 @@
             };
         }
 
-        // FLOATING SCORE LOGIC
         function showFloatingScore(teamIdx, amount) {
             if (amount === 0) return;
             const scoreCards = document.querySelectorAll('.score-card');
@@ -339,7 +320,7 @@
             setTimeout(() => floatEl.remove(), 1500);
         }
 
-        // EXACTLY 23 NORMAL QUESTIONS AS REQUESTED
+        // EXACTLY 23 NORMAL QUESTIONS 
         const rawQList = [
             { q: "At the airport, the officer decided to ______ my liquids because they were over the limit.", opts: ["reimburse", "confiscate", "encrypt", "receive"], ans: "confiscate" },
             { q: "You should keep your ______ as proof if you want a refund.", opts: ["tickets", "luggage", "receipts", "passports"], ans: "receipts" },
@@ -393,10 +374,10 @@
             return { type: 'question', q: item.q, options: sOpts, correct: sOpts.indexOf(item.ans) };
         });
 
-        let masterBoxes = [...qList, ...eventList]; // 27 boxes
+        let masterBoxes = [...qList, ...eventList]; 
         let activeBoxes = [...masterBoxes].sort(() => Math.random() - 0.5);
         
-        // TRAP BOX ALWAYS AT INDEX 14 (Box 15)
+        // Trap Box at pos 15
         activeBoxes.splice(14, 0, specialBoxData);
         activeBoxes.forEach(b => b.opened = false);
 
@@ -487,7 +468,7 @@
         function showGridScreen() {
             if (turnCounter >= 28) return endGame();
 
-            let mainTurnIdx = turnCounter % 4; // TỰ ĐỘNG CHUYỂN LƯỢT THEO VÒNG TRÒN
+            let mainTurnIdx = turnCounter % 4; 
             currentAnsweringIdx = mainTurnIdx;
             attemptedThisTurn = [];
             currentActiveBox = null;
@@ -938,62 +919,36 @@
                 
                 if(i === 0) {
                     posText = "1ST"; tierClass = "tier-1";
-                    actionHTML = `🏆 CHAMPION! Claim your physical prize!`;
                 } else if(i === 1) {
                     posText = "2ND"; tierClass = "tier-2";
-                    actionHTML = `🎁 <button class="secret-btn" onclick="revealVideo('reward')">REVEAL REWARD VIDEO</button>`;
                 } else if(i === 2) {
                     posText = "3RD"; tierClass = "tier-3";
-                    actionHTML = `💀 <button class="secret-btn" onclick="revealVideo('punish')">REVEAL PUNISHMENT VIDEO</button>`;
                 } else {
                     posText = "4TH"; tierClass = "tier-4";
-                    actionHTML = `🧹 ULTIMATE PUNISHMENT: Perform the given challenge right now!`;
+                    actionHTML = `
+                        <div style="margin-top: 15px; width: 100%;">
+                            <h3 style="color: var(--warning); margin-top: 0; text-shadow: 1px 1px 2px black;">💀 PUNISHMENT FOR LAST PLACE 💀</h3>
+                            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 15px; border: 2px solid var(--warning); box-shadow: 0 0 20px rgba(255,51,0,0.5); width: 100%;">
+                                <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/TlxKLURes1Q?autoplay=1" title="Punishment Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>`;
                 }
 
                 html += `
-                <div class="rank-tier ${tierClass}">
-                    <div class="rank-pos">${posText}</div>
-                    <div class="rank-details">
-                        <div class="rank-name">${t.name}</div>
-                        <div class="rank-score">${t.score} Points</div>
-                        <div class="rank-action">${actionHTML}</div>
+                <div class="rank-tier ${tierClass}" style="${i === 3 ? 'flex-direction: column;' : ''}">
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <div class="rank-pos">${posText}</div>
+                        <div class="rank-details">
+                            <div class="rank-name">${t.name}</div>
+                            <div class="rank-score">Score: ${t.score}</div>
+                        </div>
                     </div>
+                    ${actionHTML}
                 </div>`;
             });
             document.getElementById('rank-board').innerHTML = html;
         }
-
-        function revealVideo(type) {
-            let videoFile = type === 'reward' ? './reward.mp4' : './punish.mp4';
-            
-            const videoEl = document.createElement('video');
-            videoEl.src = videoFile;
-            videoEl.controls = true;
-            videoEl.style.position = 'fixed';
-            videoEl.style.top = '0';
-            videoEl.style.left = '0';
-            videoEl.style.width = '100vw';
-            videoEl.style.height = '100vh';
-            videoEl.style.backgroundColor = 'black';
-            videoEl.style.zIndex = '9999';
-
-            document.body.appendChild(videoEl);
-
-            videoEl.play();
-
-            if (videoEl.requestFullscreen) {
-                videoEl.requestFullscreen();
-            } else if (videoEl.webkitRequestFullscreen) {
-                videoEl.webkitRequestFullscreen();
-            } else if (videoEl.msRequestFullscreen) {
-                videoEl.msRequestFullscreen();
-            }
-
-            videoEl.onended = () => { document.exitFullscreen(); videoEl.remove(); };
-            document.addEventListener('fullscreenchange', () => {
-                if (!document.fullscreenElement && document.body.contains(videoEl)) videoEl.remove();
-            });
-        }
     </script>
 </body>
 </html>
+
