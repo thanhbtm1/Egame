@@ -323,17 +323,8 @@
             setTimeout(() => floatEl.remove(), 1500);
         }
 
+        // EXACTLY 23 NORMAL QUESTIONS
         const rawQList = [
-            { q: "\"It caused the destruction of half the houses in the town,\" he said.\n(Choose the correct reported speech)", opts: ["He said that it caused the destruction of half the houses in the town.", "He says that it causes the destruction...", "He said that it has caused the destruction...", "He told that it caused the destruction..."], ans: "He said that it caused the destruction of half the houses in the town." },
-            { q: "\"There is no electricity because of the hurricane,\" my sister called and said.", opts: ["My sister called and said that there was no electricity because of the hurricane.", "My sister called and said there is no electricity...", "My sister called and says that there was no electricity...", "My sister called and told that there was no electricity..."], ans: "My sister called and said that there was no electricity because of the hurricane." },
-            { q: "\"There will be a typhoon in the next thirty-six hours,\" the newspaper said.", opts: ["The newspaper said there would be a typhoon in the next thirty-six hours.", "The newspaper said there will be a typhoon...", "The newspaper said there would have been a typhoon...", "The newspaper said there was a typhoon..."], ans: "The newspaper said there would be a typhoon in the next thirty-six hours." },
-            { q: "\"The drought of 1999 was the worst natural disaster of the twentieth century,\" the paper said.", opts: ["The paper said the drought of 1999 had been the worst natural disaster...", "The paper said the drought of 1999 was the worst natural disaster...", "The paper said the drought of 1999 has been the worst...", "The paper said the drought of 1999 would be the worst..."], ans: "The paper said the drought of 1999 had been the worst natural disaster..." },
-            { q: "After the snowstorm, a newspaper reported: \"The blizzard of '88 caused more damage than any previous storm.\"", opts: ["A newspaper reported that the blizzard of 88 had caused more damage...", "A newspaper reported that the blizzard of 88 caused more damage...", "A newspaper reported that the blizzard of 88 has caused more damage...", "A newspaper reported that the blizzard of 88 causes more damage..."], ans: "A newspaper reported that the blizzard of 88 had caused more damage..." },
-            { q: "Which word is a synonym for 'power' or 'intensity'?", opts: ["strength", "weakness", "reduce", "element"], ans: "strength" },
-            { q: "What word means 'a basic part of something'?", opts: ["element", "reduce", "lead to", "strength"], ans: "element" },
-            { q: "What word means 'to make something smaller or less in amount'?", opts: ["reduce", "increase", "lead to", "element"], ans: "reduce" },
-            { q: "What phrase means 'to cause something to happen'?", opts: ["lead to", "reduce", "strength", "prevent"], ans: "lead to" },
-            { q: "What do you call an area where people live?", opts: ["residential area", "industrial zone", "commercial center", "forest"], ans: "residential area" },
             { q: "At the airport, the officer decided to ______ my liquids because they were over the limit.", opts: ["reimburse", "confiscate", "encrypt", "receive"], ans: "confiscate" },
             { q: "You should keep your ______ as proof if you want a refund.", opts: ["tickets", "luggage", "receipts", "passports"], ans: "receipts" },
             { q: "The airline will ______ you for the damaged suitcase.", opts: ["reimburse", "remove", "protect", "confirm"], ans: "reimburse" },
@@ -346,9 +337,20 @@
             { q: "Her ______ included visits to three different cities.", opts: ["encryption", "identity theft", "travel itinerary", "airport rule"], ans: "travel itinerary" },
             { q: "The officer suspected ______ after seeing unusual activity on his account.", opts: ["luggage loss", "identity theft", "boarding delay", "travel plan"], ans: "identity theft" },
             { q: "Strong ______ helps keep your data safe from hackers.", opts: ["receipt", "itinerary", "encryption", "refund"], ans: "encryption" },
-            { q: "If I ______ more careful, I wouldn’t lose my passport.", opts: ["am", "were", "was", "be"], ans: "were" }
+            { q: "The airport staff refused to ______ the lost items because there was no proof.", opts: ["reimburse", "confiscate", "protect", "return"], ans: "reimburse" },
+            { q: "He forgot to bring his ______, so he couldn't get a refund.", opts: ["luggage", "receipts", "passport", "ticket"], ans: "receipts" },
+            { q: "Some food was ______ at customs because it was not allowed.", opts: ["returned", "reimbursed", "confiscated", "packed"], ans: "confiscated" },
+            { q: "Without a clear ______, the trip became confusing and stressful.", opts: ["encryption", "itinerary", "receipt", "identity"], ans: "itinerary" },
+            { q: "He was worried about ______ after using a public computer.", opts: ["reimbursement", "identity theft", "travel delay", "lost luggage"], ans: "identity theft" },
+            { q: "If I ______ more careful, I wouldn’t lose my passport.", opts: ["am", "were", "was", "be"], ans: "were" },
+            { q: "If he had checked his luggage, he ______ it.", opts: ["won’t lose", "wouldn’t lose", "wouldn’t have lost", "didn’t lose"], ans: "wouldn’t have lost" },
+            { q: "If we ______ earlier, we would catch the flight now.", opts: ["leave", "left", "had left", "leaving"], ans: "had left" },
+            { q: "If I had a map, I ______ get lost.", opts: ["won’t", "wouldn’t", "didn’t", "don’t"], ans: "wouldn’t" },
+            { q: "I didn’t check my ticket carefully, so I went to the wrong gate.\n👉 Which sentence is closest in meaning?", opts: ["If I checked my ticket carefully, I wouldn’t go to the wrong gate.", "If I check my ticket carefully, I won’t go to the wrong gate.", "If I had checked my ticket carefully, I wouldn’t have gone to the wrong gate.", "If only I checked my ticket carefully, I wouldn’t go to the wrong gate."], ans: "If I had checked my ticket carefully, I wouldn’t have gone to the wrong gate." },
+            { q: "She doesn’t have much money, so she can’t travel comfortably.\n👉 Which sentence is closest in meaning?", opts: ["If she has more money, she will travel comfortably.", "If she had more money, she would travel more comfortably.", "If she had had more money, she would travel comfortably.", "If she having more money, she would travel comfortably."], ans: "If she had more money, she would travel more comfortably." }
         ];
 
+        // 1 Special Question (All Wrong)
         const specialBoxData = {
             type: 'special',
             q: "Find the correct sentence.",
@@ -362,6 +364,7 @@
             explanation: "ALL OPTIONS ARE INCORRECT!\n\n❌ A: Do not use 'would' in the If-clause.\n❌ B: Tense mismatch (past condition -> present result doesn't fit here).\n❌ C: Tense mismatch (present unreal condition -> past result).\n❌ D: 'If only' for a past regret requires Past Perfect (had + V3).\n\nCORRECT VERSIONS:\nA -> If I had checked my luggage, I wouldn't have lost it.\nB -> If I checked my luggage, I wouldn't lose it.\nC -> If I had checked my luggage, I wouldn't be in trouble now.\nD -> If only I had checked my ticket, I wouldn't have gone to the wrong gate."
         };
 
+        // 4 Events
         const eventList = [
             { type: 'points', val: 50, title: "JACKPOT", text: "You found the hidden treasure! +50 Points." },
             { type: 'give', val: 0, title: "CHARITY", text: "You must give 20 points to a random team!" },
@@ -377,6 +380,7 @@
         let masterBoxes = [...qList, ...eventList]; 
         let activeBoxes = [...masterBoxes].sort(() => Math.random() - 0.5);
         
+        // Trap Box at pos 15
         activeBoxes.splice(14, 0, specialBoxData);
         activeBoxes.forEach(b => b.opened = false);
 
@@ -918,6 +922,7 @@
                 
                 if(i === 0) {
                     posText = "1ST"; tierClass = "tier-1";
+                    actionHTML = `🏆 CHAMPION! Claim your physical prize!`;
                 } else if(i === 1) {
                     posText = "2ND"; tierClass = "tier-2";
                 } else if(i === 2) {
@@ -957,6 +962,3 @@
     </script>
 </body>
 </html>
-
-
-
