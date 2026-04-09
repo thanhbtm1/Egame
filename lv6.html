@@ -212,7 +212,7 @@
         </div>
 
         <div class="status-bar">
-            <div class="timer" id="timer-display" style="visibility: hidden;">⏳ 25</div>
+            <div class="timer" id="timer-display" style="visibility: hidden;">⏳ 20</div>
             <div class="lifelines" id="lifelines-container">
                 <button class="btn-lifeline" id="ll-5050" onclick="use5050()">50/50</button>
                 <button class="btn-lifeline" id="ll-call" onclick="useCall()">PHONE A FRIEND</button>
@@ -229,7 +229,7 @@
             <div class="penalty-text" id="penalty-text"></div>
             
             <div style="text-align: center; margin-top: 20px;">
-                <button class="btn-main" id="btn-skip-q" style="background: #ff3300; padding: 10px 30px; font-size: 1.2rem;" onclick="skipQuestion()">⏭️ SKIP (-50 PTS)</button>
+                <button class="btn-main" id="btn-skip-q" style="background: #ff3300; padding: 10px 30px; font-size: 1.2rem;" onclick="skipQuestion()">⏭️ SKIP (-15 PTS)</button>
             </div>
         </div>
         
@@ -253,8 +253,8 @@
             <h2 style="color: #00f0ff; margin-top: 0; text-align: center; font-size: 2.5rem;">📜 GAME RULES 📜</h2>
             <div style="font-size: 1.2rem; margin-bottom: 30px; line-height: 1.6;">
                 <p><b>Turn-based & Stealing:</b> Teams will take turns in a circular order. If a team provides an incorrect answer, other teams have the chance to STEAL the turn to answer.</p>
-                <p><b>Time Limit:</b> The first team has <b>25 seconds</b> to provide an answer.<br>Teams that STEAL the turn will only have <b>10 seconds</b> to respond.</p>
-                <p><b>The "SKIP" Option:</b> If you are stuck or find a question suspicious, you can spend <b>50 points</b> to SKIP it.</p>
+                <p><b>Time Limit:</b> The first team has <b>20 seconds</b> to provide an answer.<br>Teams that STEAL the turn will only have <b>10 seconds</b> to respond.</p>
+                <p><b>The "SKIP" Option:</b> If you are stuck or find a question suspicious, you can spend <b>15 points</b> to SKIP it.</p>
                 <p><b>Penalty:</b> Be careful! Choosing the wrong answer will result in a point deduction (-10, -20, or -30 points).</p>
                 <p><b>Winning Streak:</b> Successfully answering 3 questions in a row will earn your team a Secret Box.</p>
                 <p><b>Life-lines:</b> Each team is granted 3 Life-lines to use throughout the game.</p>
@@ -278,7 +278,7 @@
     <div id="steal-modal" class="modal">
         <div class="modal-content">
             <h2 style="color: var(--accent1); font-size: 2.5rem; margin-top: 0;">⚡ STEAL THE TURN</h2>
-            <p style="font-size: 1.2rem; color: #ccc;">Select the fastest team to answer (10 SECONDS ONLY):</p>
+            <p style="font-size: 1.2rem; color: #ccc;">Select the fastest team to answer:</p>
             <div class="team-select-grid" id="steal-options"></div>
             <button class="btn-main" style="background: #555; margin-top: 20px;" onclick="nobodySteals()">NO ONE STEALS</button>
         </div>
@@ -342,7 +342,6 @@
             setTimeout(() => floatEl.remove(), 1500);
         }
 
-        // EXACTLY 23 NORMAL QUESTIONS
         const rawQList = [
             { q: "I forgot to pay for my parking, and when I came back, my car was ________!", opts: ["drawing a blank", "getting towed", "being toast", "off"], ans: "getting towed" },
             { q: "\"Is it difficult to find the boarding gate?\" - \"________. Just follow the signs.\"", opts: ["No sweat", "I'm toast", "I'm off", "Safe bet"], ans: "No sweat" },
@@ -369,7 +368,6 @@
             { q: "She doesn’t have much money, so she can’t travel comfortably.\n👉 Which sentence is closest in meaning?", opts: ["If she has more money, she will travel comfortably.", "If she had more money, she would travel more comfortably.", "If she had had more money, she would travel comfortably.", "If she having more money, she would travel comfortably."], ans: "If she had more money, she would travel more comfortably." }
         ];
 
-        // 1 Special Question (All Wrong)
         const specialBoxData = {
             type: 'special',
             q: "Find the correct sentence.",
@@ -383,7 +381,6 @@
             explanation: "ALL OPTIONS ARE INCORRECT!\n\n❌ A: Do not use 'would' in the If-clause.\n❌ B: Tense mismatch (past condition -> present result doesn't fit here).\n❌ C: Tense mismatch (present unreal condition -> past result).\n❌ D: 'If only' for a past regret requires Past Perfect (had + V3).\n\nCORRECT VERSIONS:\nA -> If I had checked my luggage, I wouldn't have lost it.\nB -> If I checked my luggage, I wouldn't lose it.\nC -> If I had checked my luggage, I wouldn't be in trouble now.\nD -> If only I had checked my ticket, I wouldn't have gone to the wrong gate."
         };
 
-        // 4 Events
         const eventList = [
             { type: 'points', val: 50, title: "JACKPOT", text: "You found the hidden treasure! +50 Points." },
             { type: 'give', val: 0, title: "CHARITY", text: "You must give 20 points to a random team!" },
@@ -409,7 +406,7 @@
         let attemptedThisTurn = []; 
         let currentActiveBox = null;
         let specialBoxExplained = false;
-        let timer, timeLeft = 25; // Default time
+        let timer, timeLeft = 20;
 
         const comboGifts = [
             { t: "JACKPOT! +40 POINTS", f: () => { teams[currentAnsweringIdx].score += 40; setTimeout(()=>showFloatingScore(currentAnsweringIdx, 40), 10); }, color: "#00ff66" },
@@ -619,7 +616,7 @@
                 btn.onclick = () => checkAnswer(idx);
                 optionsArea.appendChild(btn);
             });
-            startTimer(25); // Main team gets 25s
+            startTimer(20); // Main team gets 20s
             updateComboBadge();
         }
 
@@ -671,8 +668,8 @@
         }
 
         function skipQuestion() {
-            if (teams[currentAnsweringIdx].score < 50 && currentActiveBox.type !== 'special') {
-                showCustomAlert("You need at least 50 points to skip!", "OKAY");
+            if (teams[currentAnsweringIdx].score < 15 && currentActiveBox.type !== 'special') {
+                showCustomAlert("You need at least 15 points to skip!", "OKAY");
                 return;
             }
 
@@ -682,7 +679,6 @@
             document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
 
             if (currentActiveBox.type === 'special') {
-                // Đóng họ 50 điểm nhưng được bù 100 điểm = +50 điểm tổng, hoặc code thẳng luôn +100 cho máu
                 teams[currentAnsweringIdx].score += 100;
                 playSound('sfx-tada');
                 fireConfetti();
@@ -698,13 +694,13 @@
                     });
                 }, 500);
             } else {
-                teams[currentAnsweringIdx].score -= 50;
+                teams[currentAnsweringIdx].score -= 15;
                 playSound('sfx-wrong');
                 attemptedThisTurn.push(currentAnsweringIdx);
                 teams[currentAnsweringIdx].streak = 0;
                 
                 updateScoreboard();
-                showFloatingScore(currentAnsweringIdx, -50);
+                showFloatingScore(currentAnsweringIdx, -15);
                 updateComboBadge();
                 
                 if (attemptedThisTurn.length >= 3) {
@@ -989,7 +985,7 @@
             container.innerHTML = `
                 <h3 style="color: var(--warning); margin-top: 0; text-shadow: 1px 1px 2px black;">💀 PUNISHMENT FOR LAST PLACE 💀</h3>
                 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 15px; border: 2px solid var(--warning); box-shadow: 0 0 20px rgba(255,51,0,0.5); width: 100%;">
-                    <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/TlxKLURes1Q?autoplay=1" title="Punishment Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/OerUZMrp2l0?autoplay=1" title="Punishment Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
             `;
         }
