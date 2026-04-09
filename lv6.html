@@ -212,7 +212,7 @@
         </div>
 
         <div class="status-bar">
-            <div class="timer" id="timer-display" style="visibility: hidden;">⏳ 20</div>
+            <div class="timer" id="timer-display" style="visibility: hidden;">⏳ 25</div>
             <div class="lifelines" id="lifelines-container">
                 <button class="btn-lifeline" id="ll-5050" onclick="use5050()">50/50</button>
                 <button class="btn-lifeline" id="ll-call" onclick="useCall()">PHONE A FRIEND</button>
@@ -229,7 +229,7 @@
             <div class="penalty-text" id="penalty-text"></div>
             
             <div style="text-align: center; margin-top: 20px;">
-                <button class="btn-main" id="btn-skip-q" style="background: #ff3300; padding: 10px 30px; font-size: 1.2rem;" onclick="skipQuestion()">⏭️ SKIP QUESTION</button>
+                <button class="btn-main" id="btn-skip-q" style="background: #ff3300; padding: 10px 30px; font-size: 1.2rem;" onclick="skipQuestion()">⏭️ SKIP (-50 PTS)</button>
             </div>
         </div>
         
@@ -248,6 +248,25 @@
         <button class="btn-main" onclick="location.reload()" style="margin-top: 30px;">PLAY AGAIN</button>
     </div>
 
+    <div id="rules-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px; border-color: #00f0ff; text-align: left;">
+            <h2 style="color: #00f0ff; margin-top: 0; text-align: center; font-size: 2.5rem;">📜 GAME RULES 📜</h2>
+            <div style="font-size: 1.2rem; margin-bottom: 30px; line-height: 1.6;">
+                <p><b>Turn-based & Stealing:</b> Teams will take turns in a circular order. If a team provides an incorrect answer, other teams have the chance to STEAL the turn to answer.</p>
+                <p><b>Time Limit:</b> The first team has <b>25 seconds</b> to provide an answer.<br>Teams that STEAL the turn will only have <b>10 seconds</b> to respond.</p>
+                <p><b>The "SKIP" Option:</b> If you are stuck or find a question suspicious, you can spend <b>50 points</b> to SKIP it.</p>
+                <p><b>Penalty:</b> Be careful! Choosing the wrong answer will result in a point deduction (-10, -20, or -30 points).</p>
+                <p><b>Winning Streak:</b> Successfully answering 3 questions in a row will earn your team a Secret Box.</p>
+                <p><b>Life-lines:</b> Each team is granted 3 Life-lines to use throughout the game.</p>
+                <p><b>Surprise Elements:</b> Pay close attention to every question—there might be some unexpected surprises waiting for you!</p>
+                <p><b>The Grand Prize:</b> The team with the highest score at the end will receive a special gift.</p>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn-main" onclick="closeRules()">I UNDERSTAND</button>
+            </div>
+        </div>
+    </div>
+
     <div id="custom-alert-modal" class="modal">
         <div class="modal-content" style="border-color: #ffdf00;">
             <h2 style="color: #ffdf00; margin-top: 0;">🔔 NOTICE</h2>
@@ -259,7 +278,7 @@
     <div id="steal-modal" class="modal">
         <div class="modal-content">
             <h2 style="color: var(--accent1); font-size: 2.5rem; margin-top: 0;">⚡ STEAL THE TURN</h2>
-            <p style="font-size: 1.2rem; color: #ccc;">Select the fastest team to answer:</p>
+            <p style="font-size: 1.2rem; color: #ccc;">Select the fastest team to answer (10 SECONDS ONLY):</p>
             <div class="team-select-grid" id="steal-options"></div>
             <button class="btn-main" style="background: #555; margin-top: 20px;" onclick="nobodySteals()">NO ONE STEALS</button>
         </div>
@@ -267,7 +286,7 @@
 
     <div id="call-modal" class="modal">
         <div class="modal-content">
-            <h2 style="color: var(--accent2);">📞 CALL MR. DAM</h2>
+            <h2 style="color: var(--accent2);">📞 PHONE A FRIEND</h2>
             <div id="call-content" style="font-size: 1.5rem; font-weight: bold; padding: 20px; line-height: 1.5; font-style: italic;"></div>
             <button class="btn-main" onclick="document.getElementById('call-modal').style.display='none'">THANK YOU!</button>
         </div>
@@ -325,27 +344,27 @@
 
         // EXACTLY 23 NORMAL QUESTIONS
         const rawQList = [
-            { q: "At the airport, the officer decided to ______ my liquids because they were over the limit.", opts: ["reimburse", "confiscate", "encrypt", "receive"], ans: "confiscate" },
-            { q: "You should keep your ______ as proof if you want a refund.", opts: ["tickets", "luggage", "receipts", "passports"], ans: "receipts" },
-            { q: "The airline will ______ you for the damaged suitcase.", opts: ["reimburse", "remove", "protect", "confirm"], ans: "reimburse" },
-            { q: "Before traveling, I always prepare a detailed ______.", opts: ["identity theft", "travel itinerary", "encryption", "airport code"], ans: "travel itinerary" },
-            { q: "Many travelers worry about ______ when using public Wi-Fi.", opts: ["lost luggage", "identity theft", "travel delay", "boarding pass"], ans: "identity theft" },
-            { q: "______ is used to protect personal data online.", opts: ["Refund", "Receipt", "Encryption", "Baggage"], ans: "Encryption" },
-            { q: "The security staff ______ several prohibited items from his bag.", opts: ["reimbursed", "confiscated", "returned", "borrowed"], ans: "confiscated" },
-            { q: "He showed the hotel his ______ to prove he had already paid.", opts: ["receipt", "itinerary", "luggage", "ticket"], ans: "receipt" },
-            { q: "If your flight is canceled, the airline may ______ your costs.", opts: ["destroy", "delay", "reimburse", "carry"], ans: "reimburse" },
-            { q: "Her ______ included visits to three different cities.", opts: ["encryption", "identity theft", "travel itinerary", "airport rule"], ans: "travel itinerary" },
-            { q: "The officer suspected ______ after seeing unusual activity on his account.", opts: ["luggage loss", "identity theft", "boarding delay", "travel plan"], ans: "identity theft" },
-            { q: "Strong ______ helps keep your data safe from hackers.", opts: ["receipt", "itinerary", "encryption", "refund"], ans: "encryption" },
-            { q: "The airport staff refused to ______ the lost items because there was no proof.", opts: ["reimburse", "confiscate", "protect", "return"], ans: "reimburse" },
-            { q: "He forgot to bring his ______, so he couldn't get a refund.", opts: ["luggage", "receipts", "passport", "ticket"], ans: "receipts" },
-            { q: "Some food was ______ at customs because it was not allowed.", opts: ["returned", "reimbursed", "confiscated", "packed"], ans: "confiscated" },
-            { q: "Without a clear ______, the trip became confusing and stressful.", opts: ["encryption", "itinerary", "receipt", "identity"], ans: "itinerary" },
-            { q: "He was worried about ______ after using a public computer.", opts: ["reimbursement", "identity theft", "travel delay", "lost luggage"], ans: "identity theft" },
-            { q: "If I ______ more careful, I wouldn’t lose my passport.", opts: ["am", "were", "was", "be"], ans: "were" },
-            { q: "If he had checked his luggage, he ______ it.", opts: ["won’t lose", "wouldn’t lose", "wouldn’t have lost", "didn’t lose"], ans: "wouldn’t have lost" },
-            { q: "If we ______ earlier, we would catch the flight now.", opts: ["leave", "left", "had left", "leaving"], ans: "had left" },
-            { q: "If I had a map, I ______ get lost.", opts: ["won’t", "wouldn’t", "didn’t", "don’t"], ans: "wouldn’t" },
+            { q: "I forgot to pay for my parking, and when I came back, my car was ________!", opts: ["drawing a blank", "getting towed", "being toast", "off"], ans: "getting towed" },
+            { q: "\"Is it difficult to find the boarding gate?\" - \"________. Just follow the signs.\"", opts: ["No sweat", "I'm toast", "I'm off", "Safe bet"], ans: "No sweat" },
+            { q: "I’ve been trying to remember the name of the hotel we stayed at last year, but I’m ________.", opts: ["crossing that bridge", "a safe bet", "drawing a blank", "no sweat"], ans: "drawing a blank" },
+            { q: "Your suitcase is too big for the ________. You'll have to check it in.", opts: ["itinerary", "security screening", "overhead bin", "mechanical breakdown"], ans: "overhead bin" },
+            { q: "If I miss this last flight home, ________! My boss expects me at work tomorrow morning.", opts: ["I'm off", "I'm toast", "no sweat", "the way I see it"], ans: "I'm toast" },
+            { q: "We don't have enough money for a luxury hotel yet, but we'll ________ when we get there and see our options.", opts: ["draw a blank", "be off", "be toast", "cross that bridge"], ans: "cross that bridge" },
+            { q: "It’s a ________ that the flight will be delayed; look at that huge storm coming!", opts: ["safe bet", "no sweat", "way I see it", "flat tire"], ans: "safe bet" },
+            { q: "The security officer ________ my perfume because the bottle exceeded the 100ml limit.", opts: ["reimbursed", "confiscated", "damaged", "checked"], ans: "confiscated" },
+            { q: "\"The taxi is waiting outside and I'm ready. ________! See you in a week!\"", opts: ["I'm toast", "I'm drawing a blank", "I'm off", "No sweat"], ans: "I'm off" },
+            { q: "________, we should have booked the tickets online last night to save money.", opts: ["No sweat", "The way I see it", "I'm toast", "A safe bet"], ans: "The way I see it" },
+            { q: "After our car hit a deep hole, we had to call a mechanic because of a ________.", opts: ["parking ticket", "missed connection", "mechanical breakdown", "claim"], ans: "mechanical breakdown" },
+            { q: "I had to pay extra ________ because my suitcase weighed 30kg, which is over the limit.", opts: ["checked baggage fees", "items confiscated", "security screening", "receipts"], ans: "checked baggage fees" },
+            { q: "Please keep all your ________ so the company can reimburse you for your travel expenses.", opts: ["itinerary", "flat tires", "receipts", "claims"], ans: "receipts" },
+            { q: "We missed our ________ in Paris because our first flight from Hanoi arrived two hours late.", opts: ["overhead bin", "security screening", "connection", "luggage check"], ans: "connection" },
+            { q: "Before you can enter the departure lounge, you must pass through ________.", opts: ["a breakdown", "security screening", "a claim", "a parking ticket"], ans: "security screening" },
+            { q: "If the airline loses your bag, you should file a ________ at the baggage claim desk.", opts: ["claim", "receipt", "bin", "connection"], ans: "claim" },
+            { q: "My car got a ________ because I ran over some broken glass on the road.", opts: ["mechanical breakdown", "flat tire", "parking ticket", "missed connection"], ans: "flat tire" },
+            { q: "If it ________ for the heavy traffic right now, we would be at the airport already.", opts: ["hadn't been", "weren't", "isn't", "hasn't been"], ans: "weren't" },
+            { q: "If he ________ attention to the road signs earlier, he wouldn't be getting a parking ticket now.", opts: ["had been paying", "were paying", "paid", "has been paying"], ans: "had been paying" },
+            { q: "If it hadn't been for the flight attendant's help, I ________ my heavy bag in the bin.", opts: ["wouldn't have put", "wouldn't put", "wouldn't be putting", "won't put"], ans: "wouldn't have put" },
+            { q: "I ________ to the beach right now if I were on vacation instead of being at work.", opts: ["would walk", "would have walked", "would be walking", "will be walking"], ans: "would be walking" },
             { q: "I didn’t check my ticket carefully, so I went to the wrong gate.\n👉 Which sentence is closest in meaning?", opts: ["If I checked my ticket carefully, I wouldn’t go to the wrong gate.", "If I check my ticket carefully, I won’t go to the wrong gate.", "If I had checked my ticket carefully, I wouldn’t have gone to the wrong gate.", "If only I checked my ticket carefully, I wouldn’t go to the wrong gate."], ans: "If I had checked my ticket carefully, I wouldn’t have gone to the wrong gate." },
             { q: "She doesn’t have much money, so she can’t travel comfortably.\n👉 Which sentence is closest in meaning?", opts: ["If she has more money, she will travel comfortably.", "If she had more money, she would travel more comfortably.", "If she had had more money, she would travel comfortably.", "If she having more money, she would travel comfortably."], ans: "If she had more money, she would travel more comfortably." }
         ];
@@ -380,8 +399,8 @@
         let masterBoxes = [...qList, ...eventList]; 
         let activeBoxes = [...masterBoxes].sort(() => Math.random() - 0.5);
         
-        // Trap Box at pos 15
-        activeBoxes.splice(14, 0, specialBoxData);
+        // Trap Box at pos 7 (Index 6)
+        activeBoxes.splice(6, 0, specialBoxData);
         activeBoxes.forEach(b => b.opened = false);
 
         let teams = [];
@@ -390,7 +409,7 @@
         let attemptedThisTurn = []; 
         let currentActiveBox = null;
         let specialBoxExplained = false;
-        let timer, timeLeft = 20;
+        let timer, timeLeft = 25; // Default time
 
         const comboGifts = [
             { t: "JACKPOT! +40 POINTS", f: () => { teams[currentAnsweringIdx].score += 40; setTimeout(()=>showFloatingScore(currentAnsweringIdx, 40), 10); }, color: "#00ff66" },
@@ -448,6 +467,11 @@
                 });
             }
             document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('rules-modal').style.display = 'flex';
+        }
+
+        function closeRules() {
+            document.getElementById('rules-modal').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
             updateScoreboard();
             showGridScreen();
@@ -595,7 +619,7 @@
                 btn.onclick = () => checkAnswer(idx);
                 optionsArea.appendChild(btn);
             });
-            startTimer();
+            startTimer(25); // Main team gets 25s
             updateComboBadge();
         }
 
@@ -619,9 +643,9 @@
             });
         }
 
-        function startTimer() {
+        function startTimer(seconds) {
             clearInterval(timer);
-            timeLeft = 20;
+            timeLeft = seconds;
             const timerEl = document.getElementById('timer-display');
             timerEl.style.visibility = 'visible';
             timerEl.innerText = `⏳ ${timeLeft}`;
@@ -647,12 +671,18 @@
         }
 
         function skipQuestion() {
+            if (teams[currentAnsweringIdx].score < 50 && currentActiveBox.type !== 'special') {
+                showCustomAlert("You need at least 50 points to skip!", "OKAY");
+                return;
+            }
+
             clearInterval(timer);
             document.getElementById('timer-display').classList.remove('warning');
             document.body.classList.remove('time-warning');
             document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
 
             if (currentActiveBox.type === 'special') {
+                // Đóng họ 50 điểm nhưng được bù 100 điểm = +50 điểm tổng, hoặc code thẳng luôn +100 cho máu
                 teams[currentAnsweringIdx].score += 100;
                 playSound('sfx-tada');
                 fireConfetti();
@@ -668,11 +698,13 @@
                     });
                 }, 500);
             } else {
+                teams[currentAnsweringIdx].score -= 50;
                 playSound('sfx-wrong');
                 attemptedThisTurn.push(currentAnsweringIdx);
                 teams[currentAnsweringIdx].streak = 0;
                 
                 updateScoreboard();
+                showFloatingScore(currentAnsweringIdx, -50);
                 updateComboBadge();
                 
                 if (attemptedThisTurn.length >= 3) {
@@ -778,7 +810,7 @@
                 }
             });
 
-            startTimer(); 
+            startTimer(10); // STEAL TURN ONLY GETS 10 SECONDS
         }
 
         function nobodySteals() {
@@ -841,15 +873,18 @@
                 ans = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)]; 
             }
             
-            const mrDamQuotes = [
-                `"Trời ơi! Câu này anh nhắm mắt cũng chọn được đáp án ${ans} nha cưng!"`,
-                `"Vùng đất cấm thì anh rành, chứ câu này anh chắc kèo 100% đáp án là ${ans} nhé!"`,
-                `"Anh mới chạy show bay về mệt lắm, nhưng nể tình gọi nhờ thì đáp án chuẩn là ${ans} nha!"`,
-                `"Không chọn đáp án ${ans} là anh xé vé ca nhạc ráng chịu nha!"`
+            // ĐA VŨ TRỤ NGƯỜI THÂN
+            const friendQuotes = [
+                `🎤 Mr. Dam: "Trời ơi! Câu này anh nhắm mắt cũng chọn được đáp án ${ans} nha cưng!"`,
+                `🎤 Mr. Dam: "Vùng đất cấm thì anh rành, chứ câu này anh chắc kèo 100% đáp án là ${ans} nhé!"`,
+                `⚽ Ronaldo: "SIUUU! The best answer is definitely ${ans}. Trust me!"`,
+                `⚽ Mbappe: "I'm running fast to tell you that ${ans} is the correct one, mon ami!"`,
+                `🎤 Sơn Tùng M-TP: "Sky ơi! Hãy tin Tùng, đáp án ${ans} là chân ái nhé!"`,
+                `🎤 Sơn Tùng M-TP: "Âm thầm bên em chọn đáp án ${ans} đi nào!"`
             ];
-            const quote = mrDamQuotes[Math.floor(Math.random() * mrDamQuotes.length)];
+            const quote = friendQuotes[Math.floor(Math.random() * friendQuotes.length)];
             
-            document.getElementById('call-content').innerHTML = `🎤 Mr. Dam: ${quote}`;
+            document.getElementById('call-content').innerHTML = quote;
             document.getElementById('call-modal').style.display = 'flex';
         }
 
@@ -908,7 +943,6 @@
             }
         }
 
-        // END GAME & TIERS LOGIC
         function endGame() {
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('end-screen').style.display = 'block';
