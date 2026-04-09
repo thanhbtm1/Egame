@@ -342,6 +342,7 @@
             setTimeout(() => floatEl.remove(), 1500);
         }
 
+        // EXACTLY 23 NORMAL QUESTIONS
         const rawQList = [
             { q: "I forgot to pay for my parking, and when I came back, my car was ________!", opts: ["drawing a blank", "getting towed", "being toast", "off"], ans: "getting towed" },
             { q: "\"Is it difficult to find the boarding gate?\" - \"________. Just follow the signs.\"", opts: ["No sweat", "I'm toast", "I'm off", "Safe bet"], ans: "No sweat" },
@@ -407,6 +408,12 @@
         let currentActiveBox = null;
         let specialBoxExplained = false;
         let timer, timeLeft = 20;
+
+        // SABOTAGE VARIABLES
+        let callUses = 0;
+        let callSabotaged = false;
+        let audUses = 0;
+        let audSabotaged = false;
 
         const comboGifts = [
             { t: "JACKPOT! +40 POINTS", f: () => { teams[currentAnsweringIdx].score += 40; setTimeout(()=>showFloatingScore(currentAnsweringIdx, 40), 10); }, color: "#00ff66" },
@@ -862,12 +869,21 @@
         function useCall() {
             teams[currentAnsweringIdx].lCall = true; updateLifelinesUI();
             
-            let ans = "";
-            if(currentActiveBox.correct !== -1) {
-                ans = ['A', 'B', 'C', 'D'][currentActiveBox.correct];
+            callUses++;
+            let ansIdx = currentActiveBox.correct;
+            
+            // SABOTAGE LOGIC
+            if (ansIdx !== -1) {
+                if (!callSabotaged && (Math.random() < 0.4 || callUses === 3)) {
+                    callSabotaged = true;
+                    let wrongOpts = [0,1,2,3].filter(i => i !== ansIdx);
+                    ansIdx = wrongOpts[Math.floor(Math.random() * wrongOpts.length)]; // Báo thủ
+                }
             } else {
-                ans = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)]; 
+                ansIdx = Math.floor(Math.random() * 4); 
             }
+
+            let ans = ['A', 'B', 'C', 'D'][ansIdx];
             
             // ĐA VŨ TRỤ NGƯỜI THÂN
             const friendQuotes = [
@@ -886,16 +902,29 @@
 
         function useAudience() {
             teams[currentAnsweringIdx].lAudience = true; updateLifelinesUI();
+            
+            audUses++;
             const correctIdx = currentActiveBox.correct;
             const letters = ['A', 'B', 'C', 'D'];
             let html = `Audience Votes:<br><br>`;
             
+            let highestIdx = correctIdx;
+            
+            // SABOTAGE LOGIC
+            if (correctIdx !== -1) {
+                if (!audSabotaged && (Math.random() < 0.4 || audUses === 3)) {
+                    audSabotaged = true;
+                    let wrongOpts = [0,1,2,3].filter(i => i !== correctIdx);
+                    highestIdx = wrongOpts[Math.floor(Math.random() * wrongOpts.length)]; // Khán giả báo
+                }
+            }
+
             letters.forEach((l, idx) => {
                 let percent;
                 if (correctIdx === -1) {
                     percent = Math.floor(Math.random() * 25 + 10); 
                 } else {
-                    percent = (idx === correctIdx) ? 75 : Math.floor(Math.random() * 10);
+                    percent = (idx === highestIdx) ? Math.floor(Math.random() * 15 + 65) : Math.floor(Math.random() * 10);
                 }
                 html += `Option ${l}: <b style="color:var(--accent2);">${percent}%</b><br>`;
             });
@@ -939,6 +968,7 @@
             }
         }
 
+        // END GAME & TIERS LOGIC
         function endGame() {
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('end-screen').style.display = 'block';
