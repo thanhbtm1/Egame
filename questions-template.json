@@ -1,0 +1,14 @@
+[
+  {
+    "category": "Category Name",
+    "prompt": "Your full question goes here.",
+    "options": {
+      "A": "Option A",
+      "B": "Option B",
+      "C": "Option C",
+      "D": "Option D"
+    },
+    "correct": "A",
+    "explanation": "Short explanation for the correct answer."
+  }
+]
