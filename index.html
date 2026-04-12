@@ -28,12 +28,14 @@
             <span>Current Turn</span>
             <strong id="currentTurnLabel">Team 1</strong>
           </div>
+          <section class="alliance-banner alliance-banner-inline glass hidden" id="allianceBanner"></section>
         </div>
 
         <div class="header-actions">
           <button class="hud-btn" id="soundToggleBtn" aria-pressed="false">🔊 Sound On</button>
           <button class="hud-btn primary" id="newMatchBtn">New Match</button>
           <button class="hud-btn" id="openRulesBtn">Rules</button>
+          <button class="hud-btn warn" id="endGameBtn">End Game</button>
           <button class="hud-btn" id="clearSaveBtn">Clear Save</button>
         </div>
       </header>
@@ -44,12 +46,11 @@
             <span class="eyebrow">🏁 Scoreboard</span>
             <h2>Team points and streaks</h2>
           </div>
-          <div class="score-note">Main correct: +10 score • Steal correct: +8 score</div>
+          <div class="score-note">Main correct: random $35-$100, +1 ammo, +10 score • Steal correct: random $35-$100, +8 score</div>
         </div>
         <div id="scoreboardGrid" class="scoreboard-grid"></div>
       </section>
 
-      <section class="alliance-banner glass hidden" id="allianceBanner"></section>
 
       <main class="battle-layout">
         <aside class="side-column" id="leftColumn"></aside>
@@ -66,7 +67,7 @@
 
             <div class="board-legend">
               <span><i class="legend-swatch neutral"></i> Hidden tile</span>
-              <span><i class="legend-swatch cleared"></i> Cleared tile</span>
+              <span><i class="legend-swatch cleared"></i> Resolved slot</span>
               <span><i class="legend-swatch live"></i> Active tile</span>
             </div>
 
@@ -110,7 +111,7 @@
         </div>
 
         <div class="lobby-cards">
-          <article class="lobby-card"><strong>100 HP</strong><span>Each team starts with a pistol and 1 ammo.</span></article>
+          <article class="lobby-card"><strong>300 HP</strong><span>Each team starts with 300 HP, a pistol, and 1 ammo.</span></article>
           <article class="lobby-card"><strong>28 tiles</strong><span>24 graded questions and 4 hidden event tiles.</span></article>
           <article class="lobby-card"><strong>Auto-check</strong><span>Pick A, B, C, or D and the game grades it instantly.</span></article>
           <article class="lobby-card"><strong>One frame</strong><span>The whole page stays inside one screen with no page scroll.</span></article>
@@ -131,11 +132,11 @@
 
         <div class="rules-grid">
           <article class="rule-card"><strong>Fixed turns</strong><span>The game always cycles Team 1 → Team 2 → Team 3 → Team 4.</span></article>
-          <article class="rule-card"><strong>Main answer</strong><span>The current team gets 15 seconds. Correct answer: +$50, +1 ammo, +10 score.</span></article>
-          <article class="rule-card"><strong>Steal answer</strong><span>If the main team is wrong, pick one of the other three teams for a 5-second steal.</span></article>
+          <article class="rule-card"><strong>Main answer</strong><span>The current team gets 15 seconds. Correct answer: random $35-$100, +1 ammo, +10 score.</span></article>
+          <article class="rule-card"><strong>Steal answer</strong><span>If the main team is wrong, pick one of the other three teams for an 8-second steal.</span></article>
           <article class="rule-card"><strong>Reward menu</strong><span>After a correct answer, choose Attack, +1 Ammo, Heal 15 HP, or Shop.</span></article>
-          <article class="rule-card"><strong>Streak crate</strong><span>Every 3 correct answers in a row unlock a support crate with 3 random bonuses.</span></article>
-          <article class="rule-card"><strong>Phase 2</strong><span>At 14 tiles left or when any team reaches 50 HP, the game switches to 2 vs 2.</span></article>
+          <article class="rule-card"><strong>Streak crate</strong><span>Every 3 correct answers in a row unlocks 3 mystery crates. Pick 1, then keep your turn.</span></article>
+          <article class="rule-card"><strong>Phase 2</strong><span>At 14 tiles left or when any team drops to 150 HP, the game switches to 2 vs 2.</span></article>
         </div>
 
         <div class="screen-actions two">

@@ -1,71 +1,117 @@
-# English Battle Royale
+# English Battle Royale 🎮
 
-A one-screen classroom web game for GitHub Pages.
+Game web tĩnh chạy bằng **HTML + CSS + JavaScript thuần**, phù hợp để deploy trực tiếp lên **GitHub Pages**.
 
-## What this build includes
+## Có gì trong bản này
 
-- Fixed turn order: Team 1 -> Team 2 -> Team 3 -> Team 4
-- 28 hidden tiles total
-  - 24 graded English questions
-  - 4 event tiles
-- Full-English UI
-- One-screen layout with no page scroll
-- Refined compact layout so 100% browser zoom fits more safely without text collisions
-- Built-in Web Audio sound effects with a header sound toggle
-- Extra stage transitions, arena flash feedback, and timer progress animation
-- Timer flicker fix: the question popup no longer re-renders every second
-- Scoreboard at the top with team name, score, and streak
-- Team 1 and Team 2 always visible on the left
-- Team 3 and Team 4 always visible on the right
-- Start flow:
-  - edit team names
-  - click **Start Game**
-  - read the rules
-  - enter the arena
-- Automatic answer checking for A/B/C/D questions
-- 15-second main turn and 5-second steal turn
-- Steal round picker that shows the other three teams
-- Reward menu after a correct answer:
-  - Attack
-  - +1 Ammo
-  - Heal 15 HP
-  - Shop
-- 3-correct streak support crate
-- Phase 2 alliance mode at 14 tiles left or when a team reaches 50 HP
-- Autosave with localStorage
+- 4 đội chơi, giao diện glassmorphism neon dễ bấm trên máy chiếu/laptop.
+- 28 ô câu hỏi, trong đó tự random **4 ô bất ngờ**.
+- Timer 15 giây cho lượt chính, 5 giây cho cướp lượt.
+- Trả lời đúng nhận tiền, đạn và được chọn hành động sau câu hỏi.
+- Hệ shop: nâng cấp súng, mua item, dùng item trực tiếp trên giao diện.
+- Streak 3 câu đúng liên tiếp sẽ mở **rương tiếp viện**.
+- Tự động kích hoạt **Phase 2: 2vs2** khi còn 14 câu hoặc có đội còn 50 HP trở xuống.
+- Autosave bằng `localStorage`.
+- Có thể nhập câu hỏi bằng JSON ngay trong giao diện setup.
 
-## Combat values
+## Cân bằng đang dùng
 
-- USP Pistol: 12 damage
-- MP-40: 18 damage
-- AK-47: 28 damage
-- AWM: 45 damage and shield-piercing
+### Chỉ số khởi đầu
 
-## Economy values
+- Máu: `100 HP`
+- Tiền: `$0`
+- Đạn: `1 ammo`
+- Vũ khí mặc định: `USP`
 
-- Main correct answer: +$50, +1 ammo, +10 score
-- Steal correct answer: +$50, +8 score
+### Reward khi trả lời đúng
 
-## Question bank note
+- Lượt chính: `+$50` và `+1 ammo`
+- Cướp lượt: `+$50`
+- Sau đó đội chọn một hành động:
+  - Khai hỏa
+  - Tích đạn
+  - Hồi máu
+  - Mở shop
 
-The attached bank had 23 questions, so this build includes 1 extra clean airport-vocabulary filler question to make the board exactly 24 questions + 4 event tiles.
+### Sát thương vũ khí
 
-Edit `questions.js` if you want to replace or expand the bank.
+| Vũ khí | Damage | Giá nâng cấp |
+|---|---:|---:|
+| USP | 12 | Mặc định |
+| MP-40 | 18 | $100 |
+| AK-47 | 28 | $180 |
+| AWM | 45 | $300 |
 
-## Deploy to GitHub Pages
+> AWM có khả năng xuyên khiên.
 
-1. Create a new GitHub repository.
-2. Upload all files in this folder to the `main` branch.
-3. Go to **Settings -> Pages**.
-4. Under **Build and deployment**, choose **Deploy from a branch**.
-5. Select `main` and `/ (root)`.
-6. Save.
-7. Wait for GitHub Pages to publish the site.
+### Item shop
 
-## Files
+| Item | Giá | Tác dụng |
+|---|---:|---|
+| Ammo +1 | $30 | +1 ammo ngay |
+| Medkit | $70 | Hồi 35 HP khi dùng |
+| Khiên | $80 | Chặn 1 đòn |
+| Flashbang | $100 | Khóa 1 đội ở câu kế tiếp |
+| Phản đạn | $110 | Phản 50% damage hit kế |
+| Berserk | $120 | Phát bắn kế miễn ammo, +10 damage |
+| C4 | $130 | Gài bom áp lực lên đối thủ |
+| Thief Card | $140 | Cướp 50% tiền và 1 ammo |
 
-- `index.html` -> layout
-- `styles.css` -> visual design and effects
-- `questions.js` -> question bank
-- `app.js` -> game logic
-- `.nojekyll` -> GitHub Pages compatibility
+## Format JSON câu hỏi
+
+Bạn có thể nhập JSON trong popup setup, ví dụ:
+
+```json
+[
+  {
+    "category": "Grammar",
+    "prompt": "What is the past tense of go?",
+    "answer": "went"
+  },
+  {
+    "category": "Vocabulary",
+    "prompt": "Translate 'môi trường' into English.",
+    "answer": "environment",
+    "surprise": true
+  }
+]
+```
+
+- Nếu không đủ 28 câu, game sẽ tự bù từ bộ mẫu.
+- Nếu nhiều hơn 28 câu, game lấy 28 câu đầu.
+- Nếu không đánh dấu `surprise`, game sẽ tự random đủ 4 ô bất ngờ.
+
+## Cách chạy local
+
+Chỉ cần mở file `index.html` bằng trình duyệt.
+
+## Deploy bằng GitHub Pages
+
+### Cách nhanh nhất
+
+1. Tạo repository mới trên GitHub.
+2. Upload toàn bộ file trong thư mục này lên nhánh `main`.
+3. Vào **Settings** → **Pages**.
+4. Ở mục **Build and deployment**:
+   - Source: `Deploy from a branch`
+   - Branch: `main`
+   - Folder: `/root`
+5. Save.
+6. Chờ GitHub Pages build xong và mở link website của repo.
+
+### Cấu trúc file tối thiểu
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `questions.js`
+- `.nojekyll`
+
+## Mẹo dùng trên lớp
+
+- Bật fullscreen trình duyệt để bảng câu hỏi trông đẹp hơn.
+- Nếu host lỡ bấm nhầm ô, dùng nút `✕` trong popup câu hỏi để đóng mà không tiêu tốn câu.
+- Dùng nút `Âm thanh` để bật/tắt hiệu ứng timer.
+- Dùng `Xóa autosave` nếu muốn bắt đầu từ trạng thái hoàn toàn sạch.
+
+Chúc project của bạn bùng nổ trong lớp học 🚀
