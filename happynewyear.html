@@ -19,24 +19,24 @@
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             overflow-x: hidden;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 15px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             backdrop-filter: blur(5px);
-            max-width: 500px;
+            max-width: 550px;
             width: 100%;
             z-index: 10;
         }
 
         h1 {
             color: #ff4757;
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 10px;
             animation: bounce 1.5s infinite alternate;
         }
@@ -71,28 +71,47 @@
         .img-container {
             max-height: 0;
             opacity: 0;
-            overflow: hidden;
+            overflow-y: auto; /* Thêm thanh cuộn nếu danh sách ảnh dài */
             transition: max-height 0.6s ease-in-out, opacity 0.5s ease-in-out;
             margin-top: 10px;
+            padding: 5px;
             
-            /* Dạng lưới chia 2 cột cho nhiều ảnh */
+            /* Mặc định hiển thị 1 cột trên điện thoại */
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            grid-template-columns: 1fr;
+            gap: 15px;
         }
 
-        /* Lớp CSS được thêm vào bằng JS khi bấm nút */
+        /* Khi bấm nút thì hiển thị toàn bộ khung */
         .img-container.show {
-            max-height: 1000px; /* Mở rộng chiều cao để chứa nhiều ảnh */
+            max-height: 70vh; /* Tự điều chỉnh theo 70% chiều cao màn hình */
             opacity: 1;
         }
 
+        /* Tối ưu hiển thị ảnh trọn vẹn không mất chi tiết */
         .img-container img {
             width: 100%;
-            height: 150px;
+            height: auto; /* Giữ nguyên tỉ lệ gốc của ảnh */
+            max-height: 350px; /* Giới hạn chiều cao tối đa */
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+            object-fit: contain; /* Giúp hiện full ảnh, không bị cắt tỉa */
+            background-color: #f8f9fa; /* Nền xám nhẹ cho ảnh bớt trống */
+        }
+
+        /* Media Query: Trên màn hình máy tính (PC) từ 600px trở lên sẽ hiện 2 cột */
+        @media (min-width: 600px) {
+            .card {
+                padding: 30px 25px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .img-container {
+                grid-template-columns: repeat(2, 1fr); /* 2 cột trên PC */
+            }
         }
 
         @keyframes bounce {
@@ -127,18 +146,16 @@
 
         <!-- Khung hiện danh sách nhiều ảnh -->
         <div class="img-container" id="myImageContainer">
-            <!-- Bạn chỉ cần thay link trong thuộc tính src thành tên file của bạn (ví dụ: src="anh1.jpg") -->
-            <img src="IMG_9166.jpeg" alt="Ảnh sinh nhật 1">
+            <img src="IMG_8567.jpeg" alt="Ảnh sinh nhật 1">
             <img src="IMG_9166.jpeg" alt="Ảnh sinh nhật 2">
             <img src="att.fUcCqLFFqvxPHamnaBOKhaC596pzYUHMMMX5Dc0OgIg.jpeg" alt="Ảnh sinh nhật 3">
-            <img src="IMG_8567.jpeg" alt="Ảnh sinh nhật 4">
+            <img src="IMG_9169.jpeg" alt="Ảnh sinh nhật 4">
         </div>
     </div>
 
     <script>
         function toggleImage() {
             const imgContainer = document.getElementById('myImageContainer');
-            // Thêm hoặc xóa class 'show' để hiện/ẩn danh sách ảnh
             imgContainer.classList.toggle('show');
         }
 
